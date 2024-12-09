@@ -25,7 +25,6 @@ class GimnasioController {
     updateGimnasio = (req, res) => {
         const gimnasio = req.body;
         gimnasio.id = req.params.id;
-        console.log(gimnasio);
         gimnasioModel.updateGimnasio(gimnasio, (err, data) => {
             if (err) {
                 res.status(500).json({ message: 'Error al actualizar el gimnasio' });
