@@ -3,6 +3,7 @@ const express = require('express');
 const gimnasioRouter = require('./routes/gimnasio');
 const usuarioRouter = require('./routes/usuario');
 const socioRouter = require('./routes/socio');
+const planRouter = require('./routes/plan');
 
 require('dotenv').config();
 const port = process.env.PORT;
@@ -23,6 +24,7 @@ app.get('/', (req, res)=>{
 app.use('/gimnasios', gimnasioRouter);
 app.use('/usuarios', usuarioRouter);
 app.use('/socios', socioRouter);
+app.use('/planes', planRouter);
 
 
 
