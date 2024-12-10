@@ -4,6 +4,7 @@ const gimnasioRouter = require('./routes/gimnasio');
 const usuarioRouter = require('./routes/usuario');
 const socioRouter = require('./routes/socio');
 const planRouter = require('./routes/plan');
+const inscripcionRouter = require('./routes/inscripcion');
 
 require('dotenv').config();
 const port = process.env.PORT;
@@ -25,6 +26,7 @@ app.use('/gimnasios', gimnasioRouter);
 app.use('/usuarios', usuarioRouter);
 app.use('/socios', socioRouter);
 app.use('/planes', planRouter);
+app.use('/inscripciones', inscripcionRouter);
 
 
 
