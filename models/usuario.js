@@ -6,8 +6,7 @@ class UsuarioModel{
     }
 
     createUsuario = (usuario, callback) => { //chequear si hace falta agregar el password
-        console.log(usuario);
-        db.query('INSERT INTO usuario (nombre, apellido, mail) VALUES (?, ?, ?, ?)', [usuario.nombre, usuario.apellido, usuario.mail,], callback);
+        db.query('INSERT INTO usuario (nombre, apellido, mail) VALUES (?, ?, ?)', [usuario.nombre, usuario.apellido, usuario.mail,], callback);
     }
 
     updateUsuario = (usuario, callback) => {
@@ -18,3 +17,5 @@ class UsuarioModel{
         db.query('DELETE FROM usuario WHERE idUsuario = ?', [id], callback);
     }
 }
+
+module.exports = new UsuarioModel();

@@ -1,9 +1,9 @@
-const gimnasioRouter = require('express').Router();
+const router = require('express').Router();
 const gimnasioController = require('../controllers/gimnasio');
 
-gimnasioRouter.get('/', gimnasioController.getAllGimnasios);
-gimnasioRouter.post('/', gimnasioController.createGimnasio);
-gimnasioRouter.put('/:id', gimnasioController.updateGimnasio);
-gimnasioRouter.delete('/:id', gimnasioController.deleteGimnasio);
+router.get('/', gimnasioController.getAllGimnasios);
+router.post('/', gimnasioController.createGimnasio);
+router.put('/:id', gimnasioController.updateGimnasio);
+router.delete('/:id', gimnasioController.deleteGimnasio);
 
-module.exports = gimnasioRouter;
+module.exports = router;
