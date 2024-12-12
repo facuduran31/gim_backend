@@ -1,6 +1,7 @@
 const db = require('./db.js');
 
-class UsuarioModel{
+
+class UsuarioModel {
     getAllUsuarios = (callback) => {
         db.query('SELECT * FROM usuario', callback);
     }
@@ -15,6 +16,10 @@ class UsuarioModel{
 
     deleteUsuario = (id, callback) => {
         db.query('DELETE FROM usuario WHERE idUsuario = ?', [id], callback);
+    }
+
+    login = (mail, callback) => {
+        db.query('SELECT * FROM usuario WHERE mail = ?', [mail], callback);
     }
 }
 
