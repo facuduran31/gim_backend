@@ -1,5 +1,6 @@
 const UsuarioModel = require('../models/usuario.js');
 const { generateToken } = require('../middlewares/token.js');
+const secretOrPrivateKey = process.env.secretOrPrivateKey
 
 class UsuarioController {
     getAllUsuarios = (req, res) => {
@@ -60,8 +61,8 @@ class UsuarioController {
 
     login(req, res) {
         const mail = req.body.mail;
-        //const password = req.body.password; 
-        UsuarioModel.login(mail, (err, data) => {
+        const password = req.body.password; 
+        UsuarioModel.login(mail, password, (err, data) => {
             if (err) {
                 res.status(500).json({ error: 'Error al iniciar sesión' });
             } else {
@@ -69,7 +70,7 @@ class UsuarioController {
                 if (data.length > 0) {
                     const payload = {
                         mail: data[0].mail,
-                        //password: pass,
+                        password: data[0].password,
                     };
                     const token = generateToken(payload);
                     res.json({ token, user: data[0] });
