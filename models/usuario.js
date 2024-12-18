@@ -6,6 +6,10 @@ class UsuarioModel {
         db.query('SELECT * FROM usuario', callback);
     }
 
+    getUsuarioById = (id, callback) => {
+        db.query('SELECT * FROM usuario WHERE idUsuario = ?', [id], callback);
+    }
+
     createUsuario = (usuario, callback) => { //chequear si hace falta agregar el password
         db.query('INSERT INTO usuario (nombre, apellido, mail) VALUES (?, ?, ?)', [usuario.nombre, usuario.apellido, usuario.mail,], callback);
     }

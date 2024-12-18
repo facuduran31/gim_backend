@@ -5,12 +5,25 @@ class planController{
     getAllPlanes = (req, res) => {
         planModel.getAllPlanes((err, data) => {
             if(err){
-                res.status(500).json({error: err});
+                res.status(500).json({error: 'Error al obtener los planes'});
             }else{
                 res.status(200).json(data);
             }
         });
     }
+
+    getPlanById = (req, res) => {
+        const id = req.params.id;
+        planModel.getPlanById(id, (err, data) => {
+            if(err){
+                res.status(500).json({error: 'Error al obtener el plan'});
+            }else{
+                res.status(200).json(data);
+            }
+        }
+        );
+    }
+            
 
     createPlan = (req, res) => {
         const plan = req.body;

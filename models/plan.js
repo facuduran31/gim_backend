@@ -5,6 +5,10 @@ class planModel{
         db.query('SELECT * FROM plan', callback);
     }
 
+    getPlanById = (id, callback) => {
+        db.query('SELECT * FROM plan WHERE idPlan = ?', [id], callback);
+    }
+
     createPlan = (plan, callback) => {
         db.query('INSERT INTO plan (nombre, descripcion, precio, duracion, diasPorSemana, idGimnasio) VALUES (?, ?, ?, ?, ?, ?)', [plan.nombre, plan.descripcion, plan.precio, plan.duracion, plan.diasPorSemana, plan.idGimnasio], callback);
     }
