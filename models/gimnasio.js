@@ -5,6 +5,10 @@ class gimnasioModel{
         db.query('SELECT * FROM gimnasio', callback);
     }
 
+    getGimnasioById = (id, callback) => {
+        db.query('SELECT * FROM gimnasio WHERE idGimnasio = ?', [id], callback);
+    }
+
     createGimnasio = (gimnasio, callback) => {
         console.log(gimnasio);
         db.query('INSERT INTO gimnasio (nombre, logo) VALUES (?, ?)', [gimnasio.nombre, gimnasio.logo], callback);

@@ -5,6 +5,10 @@ class SocioModel{
         db.query('SELECT * FROM socio', callback);
     }
 
+    getSocioById = (id, callback) => {
+        db.query('SELECT * FROM socio WHERE idSocio = ?', [id], callback);
+    }
+
     createSocio = (socio, callback) => {
         db.query('INSERT INTO socio (nombre, apellido, dni, telefono, activo) VALUES (?, ?, ?, ?, ?)', [socio.nombre, socio.apellido, socio.dni, socio.telefono, socio.activo], callback);
     }

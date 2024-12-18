@@ -11,6 +11,17 @@ class GimnasioController {
         });
     }
 
+    getGimnasioById = (req, res) => {
+        const id = req.params.id;
+        gimnasioModel.getGimnasioById(id, (err, data) => {
+            if (err) {
+                res.status(500).json({ message: 'Error al obtener el gimnasio' });
+            } else {
+                res.json(data);
+            }
+        });
+    }
+
     createGimnasio = (req, res) => {
         const gimnasio = req.body;
         gimnasioModel.createGimnasio(gimnasio, (err, data) => {
