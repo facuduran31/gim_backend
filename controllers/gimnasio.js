@@ -1,4 +1,5 @@
 const gimnasioModel = require('../models/gimnasio');
+const gimnasioSchema = require('../interfaces/gimnasio');
 
 class GimnasioController {
     getAllGimnasios = (req, res) => {
@@ -36,26 +37,40 @@ class GimnasioController {
 
     createGimnasio = (req, res) => {
         const gimnasio = req.body;
-        gimnasioModel.createGimnasio(gimnasio, (err, data) => {
-            if (err) {
-                res.status(500).json({ message: 'Error al crear el gimnasio' });
-            } else {
-                res.json({ message: 'Gimnasio creado correctamente' });
-            }
-        });
+        const gimnasioValido = gimnasioSchema.safeParse(gimnasio);
+        if (gimnasioValido.success) {
+            gimnasioModel.createGimnasio(gimnasio, (err, data) => {
+                if (err) {
+                    res.status(500).json({ message: 'Error al crear el gimnasio' });
+                } else {
+                    res.json({ message: 'Gimnasio creado correctamente' });
+                }
+            });
+        }
+        else {
+            res.status(400).json({ message: gimnasioValido.error.errors[0].message });
+        }
     }
 
     updateGimnasio = (req, res) => {
         const gimnasio = req.body;
-        gimnasio.id = req.params.id;
-        gimnasioModel.updateGimnasio(gimnasio, (err, data) => {
-            if (err) {
-                res.status(500).json({ message: 'Error al actualizar el gimnasio' });
-                console.log(err);
-            } else {
-                res.json({ message: 'Gimnasio actualizado correctamente' });
-            }
-        });
+        gimnasio.id = parseInt(req.params.id);
+        const gimnasioValido = gimnasioSchema.safeParse(gimnasio);
+        if (gimnasioValido.success) {
+            gimnasioModel.updateGimnasio(gimnasio, (err, data) => {
+                if (err) {
+                    res.status(500).json({ message: 'Error al actualizar el gimnasio' });
+                    console.log(err);
+                } else {
+                    res.json({ message: 'Gimnasio actualizado correctamente' });
+                }
+            });
+        }
+        else {
+            res.status(400).json({ message: gimnasioValido.error.errors[0].message });
+        }
+
+
     }
 
     deleteGimnasio = (req, res) => {

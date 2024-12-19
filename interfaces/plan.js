@@ -1,21 +1,13 @@
-class Plan {
-  id;
-  nombre;
-  descripcion;
-  precio;
-  duracion;
-  diasPorSemana;
-  idGimnasio;
+const z = require('zod');
 
-  constructor(id, nombre, descripcion, precio, duracion, diasPorSemana, idGimnasio) {
-    this.id = id;
-    this.nombre = nombre;
-    this.descripcion = descripcion;
-    this.precio = precio;
-    this.duracion = duracion;
-    this.diasPorSemana = diasPorSemana;
-    this.idGimnasio = idGimnasio;
-  }
-}
+const planSchema = z.object({
+  id: z.number().int().positive().optional(),
+  nombre: z.string(),
+  descripcion: z.string().optional(),
+  precio: z.number().positive(),
+  duracion: z.number().int().positive(),
+  diasPorSemana: z.number().int().positive().optional(), //ver como resolver esto
+  idGimnasio: z.number().int().positive()
+});
 
-module.exports = Plan;
+module.exports = planSchema;

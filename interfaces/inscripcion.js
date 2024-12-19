@@ -1,17 +1,11 @@
-class Inscripcion {
-  id;
-  idSocio;
-  idPlan;
-  fechaInicio;
-  fechaFin;
+const z = require('zod');
 
-  constructor(id, idSocio, idPlan, fechaInicio, fechaFin) {
-    this.id = id;
-    this.idSocio = idSocio;
-    this.idPlan = idPlan;
-    this.fechaInicio = fechaInicio;
-    this.fechaFin = fechaFin;
-  }
-}
+const inscripcionSchema = z.object({
+  id: z.number().int().positive().optional(),
+  idSocio: z.number().int().positive(),
+  idPlan: z.number().int().positive(),
+  fechaInicio: z.string(),
+  fechaFin: z.string()
+});
 
-module.exports = Inscripcion;
+module.exports = inscripcionSchema;
