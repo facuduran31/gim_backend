@@ -7,11 +7,11 @@ class UsuarioModel {
     }
 
     createUsuario = (usuario, callback) => { //chequear si hace falta agregar el password
-        db.query('INSERT INTO usuario (nombre, apellido, mail) VALUES (?, ?, ?)', [usuario.nombre, usuario.apellido, usuario.mail,], callback);
+        db.query('INSERT INTO usuario (nombre, apellido, mail, password) VALUES (?, ?, ?, ?)', [usuario.nombre, usuario.apellido, usuario.mail, usuario.password], callback);
     }
 
     updateUsuario = (usuario, callback) => {
-        db.query('UPDATE usuario SET nombre = ?, apellido = ?, mail = ? WHERE idUsuario = ?', [usuario.nombre, usuario.apellido, usuario.mail, usuario.id], callback);
+        db.query('UPDATE usuario SET nombre = ?, apellido = ?, mail = ?, password= ? WHERE idUsuario = ?', [usuario.nombre, usuario.apellido, usuario.mail, usuario.password, usuario.id], callback);
     }
 
     deleteUsuario = (id, callback) => {
