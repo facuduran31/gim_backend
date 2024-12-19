@@ -5,7 +5,7 @@ const gimnasioController = require('../controllers/gimnasio');
 
 router.get('/', gimnasioController.getAllGimnasios);
 router.get('/:id', gimnasioController.getGimnasioById);
-router.get('/user/:idUsuario', gimnasioController.getGimnasioByUser);
+router.get('/usuario/:idUsuario', gimnasioController.getGimnasioByUser);
 router.post('/', gimnasioController.createGimnasio);
 router.put('/:id', gimnasioController.updateGimnasio);
 router.delete('/:id', gimnasioController.deleteGimnasio);
