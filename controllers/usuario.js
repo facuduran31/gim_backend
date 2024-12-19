@@ -68,7 +68,7 @@ class UsuarioController {
             } else {
 
                 if (data.length > 0) {
-                    const payload = req.body;
+                    const payload = data[0];
                     const token = generateToken(payload);
                     res.json({ token, user: data[0] });
                 } else {
