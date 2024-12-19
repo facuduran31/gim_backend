@@ -4,9 +4,9 @@ const inscripcionController = require('../controllers/inscripcion');
 
 
 router.get('/', inscripcionController.getAllInscripciones);
-router.get('/:idSocio/:idPlan', inscripcionController.getInscripcionById);
+router.get('/:idSocioPlan', inscripcionController.getInscripcionById);
 router.post('/', inscripcionController.createInscripcion);
-router.patch('/:idSocio/:idPlan', inscripcionController.updateInscripcion);
-router.delete('/:idSocio/:idPlan', inscripcionController.deleteInscripcion);
+router.patch('/:idSocioPlan', inscripcionController.updateInscripcion);
+router.delete('/:idSocioPlan', inscripcionController.deleteInscripcion);
 
 module.exports = router;
