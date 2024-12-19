@@ -5,7 +5,19 @@ class inscripcionController{
     getAllInscripciones = (req, res) => {
         inscripcionModel.getAllInscripciones((err, data) => {
             if(err){
-                res.status(500).json({error: err});
+                res.status(500).json({error: 'Error al obtener las inscripciones'});
+            }else{
+                res.status(200).json(data);
+            }
+        });
+    }
+
+    getInscripcionById = (req, res) => {
+        const idSocio= req.params.idSocio;
+        const idPlan= req.params.idPlan;
+        inscripcionModel.getInscripcionById(idSocio, idPlan, (err, data) => {
+            if(err){
+                res.status(500).json({error: 'error al obtener la inscripcion'});
             }else{
                 res.status(200).json(data);
             }

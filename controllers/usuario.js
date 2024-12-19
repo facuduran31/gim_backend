@@ -1,11 +1,23 @@
 const UsuarioModel = require('../models/usuario.js');
 const { generateToken } = require('../middlewares/token.js');
+const secretOrPrivateKey = process.env.secretOrPrivateKey
 
 class UsuarioController {
     getAllUsuarios = (req, res) => {
         UsuarioModel.getAllUsuarios((err, data) => {
             if (err) {
-                res.status(500).json({ message: 'Error al obtener los usuarios' });
+                res.status(500).json({ error: 'Error al obtener los usuarios' });
+            } else {
+                res.json(data);
+            }
+        });
+    }
+
+    getUsuarioById = (req, res) => {
+        const id = req.params.id;
+        UsuarioModel.getUsuarioById(id, (err, data) => {
+            if (err) {
+                res.status(500).json({ error: 'Error al obtener el usuario' });
             } else {
                 res.json(data);
             }
@@ -16,7 +28,7 @@ class UsuarioController {
         const usuario = req.body;
         UsuarioModel.createUsuario(usuario, (err, data) => {
             if (err) {
-                res.status(500).json({ message: 'Error al crear el usuario' });
+                res.status(500).json({ error: 'Error al crear el usuario' });
             } else {
                 res.json({ message: 'Usuario creado correctamente' });
             }
@@ -28,7 +40,7 @@ class UsuarioController {
         usuario.id = req.params.id;
         UsuarioModel.updateUsuario(usuario, (err, data) => {
             if (err) {
-                res.status(500).json({ message: 'Error al actualizar el usuario' });
+                res.status(500).json({ error: 'Error al actualizar el usuario' });
                 console.log(err);
             } else {
                 res.json({ message: 'Usuario actualizado correctamente' });
@@ -40,7 +52,7 @@ class UsuarioController {
         const id = req.params.id;
         UsuarioModel.deleteUsuario(id, (err, data) => {
             if (err) {
-                res.status(500).json({ message: 'Error al eliminar el usuario' });
+                res.status(500).json({ error: 'Error al eliminar el usuario' });
             } else {
                 res.json({ message: 'Usuario eliminado correctamente' });
             }
@@ -49,21 +61,21 @@ class UsuarioController {
 
     login(req, res) {
         const mail = req.body.mail;
-        //const password = req.body.password; 
-        UsuarioModel.login(mail, (err, data) => {
+        const password = req.body.password; 
+        UsuarioModel.login(mail, password, (err, data) => {
             if (err) {
-                res.status(500).json({ message: 'Error al iniciar sesión' });
+                res.status(500).json({ error: 'Error al iniciar sesión' });
             } else {
 
                 if (data.length > 0) {
                     const payload = {
                         mail: data[0].mail,
-                        //password: pass,
+                        password: data[0].password,
                     };
                     const token = generateToken(payload);
                     res.json({ token, user: data[0] });
                 } else {
-                    res.status(404).send({ message: 'user not found' });
+                    res.status(404).send({ error: 'Usuario no encontrado' });
                 }
 
             }
