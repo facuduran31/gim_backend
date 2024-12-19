@@ -24,17 +24,23 @@ class UsuarioController {
         });
     }
 
-    createUsuario = (req, res) => {
+    createUsuario = async (req, res) => {
         const usuario = req.body;
         const usuarioValido = usuarioSchema.safeParse(usuario);
         if (usuarioValido.success) {
-            UsuarioModel.createUsuario(usuario, (err, data) => {
-                if (err) {
-                    res.status(500).json({ error: 'Error al crear el usuario' });
-                } else {
-                    res.json({ message: 'Usuario creado correctamente' });
-                }
-            });
+            const duplicado = await this.searchDuplicateMail(usuario.mail);
+            if (!duplicado) {
+                UsuarioModel.createUsuario(usuario, (err, data) => {
+                    if (err) {
+                        res.status(500).json({ error: 'Error al crear el usuario' });
+                    } else {
+                        res.json({ message: 'Usuario creado correctamente' });
+                    }
+                });
+            } else {
+                res.status(400).json({ error: 'El mail ya está registrado' });
+            }
+
         } else {
             res.status(400).json({ error: usuarioValido.error.errors[0].message });
         }
@@ -94,6 +100,19 @@ class UsuarioController {
         } else {
             res.status(400).json({ error: loginValido.error.errors[0].message });
         }
+    }
+
+
+    searchDuplicateMail = async (mail) => {
+        return new Promise((resolve, reject) => {
+            UsuarioModel.searchDuplicateMail(mail, (err, data) => {
+                if (err) {
+                    reject('Error al buscar el mail');
+                } else {
+                    resolve(data.length > 0);
+                }
+            });
+        });
     }
 
 
