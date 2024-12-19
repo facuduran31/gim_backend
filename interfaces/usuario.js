@@ -13,3 +13,5 @@ class Usuario {
     this.password = password;
   }
 }
+
+module.exports = Usuario;
