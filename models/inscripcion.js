@@ -5,7 +5,7 @@ class inscripcionModel {
         db.query('SELECT * FROM socio_plan', callback);
     }
 
-    getInscripcionById = (idSocio, idPlan, callback) => {
+    getInscripcionById = (idSocioPlan, callback) => {
         db.query('SELECT * FROM socio_plan WHERE idSocioPlan = ?', [idSocioPlan], callback);
     }
 

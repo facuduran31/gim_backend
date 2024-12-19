@@ -1,4 +1,5 @@
 const inscripcionModel = require('../models/inscripcion');
+const inscripcionSchema = require('../interfaces/inscripcion');
 
 class inscripcionController {
 
@@ -25,25 +26,40 @@ class inscripcionController {
 
     createInscripcion = (req, res) => {
         const inscripcion = req.body;
-        inscripcionModel.createInscripcion(inscripcion, (err, data) => {
-            if (err) {
-                res.status(500).json({ error: err });
-            } else {
-                res.status(201).json({ message: 'Inscripcion creada con éxito' });
-            }
-        });
+        const inscripcionValida = inscripcionSchema.safeParse(inscripcion);
+        if (inscripcionValida.success) {
+
+            inscripcionModel.createInscripcion(inscripcion, (err, data) => {
+                if (err) {
+                    res.status(500).json({ error: err });
+                } else {
+                    res.status(201).json({ message: 'Inscripcion creada con éxito' });
+                }
+            });
+        }
+        else {
+            res.status(400).json({ error: inscripcionValida.error.errors[0].message });
+        }
     }
+
 
     updateInscripcion = (req, res) => {
         const inscripcion = req.body;
         inscripcion.idSocioPlan = req.params.idSocioPlan;
-        inscripcionModel.updateInscripcion(inscripcion, (err, data) => {
-            if (err) {
-                res.status(500).json({ error: err });
-            } else {
-                res.status(200).json({ message: 'Inscripcion actualizada con éxito' });
-            }
-        });
+        const inscripcionValida = inscripcionSchema.safeParse(inscripcion);
+
+        if (inscripcionValida.success) {
+            inscripcionModel.updateInscripcion(inscripcion, (err, data) => {
+                if (err) {
+                    res.status(500).json({ error: err });
+                } else {
+                    res.status(200).json({ message: 'Inscripcion actualizada con éxito' });
+                }
+            });
+        }
+        else {
+            res.status(400).json({ error: inscripcionValida.error.errors[0].message });
+        }
     }
 
     deleteInscripcion = (req, res) => {

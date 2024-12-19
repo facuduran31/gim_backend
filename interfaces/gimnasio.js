@@ -1,15 +1,10 @@
-class Gimnasio {
-  id;
-  nombre;
-  logo;
-  idUsuario;
+const z = require('zod');
 
-  constructor(id, nombre, logo, idUsuario) {
-    this.id = id;
-    this.nombre = nombre;
-    this.logo = logo;
-    this.idUsuario = idUsuario;
-  }
-}
+const gimnasioSchema = z.object({
+  id: z.number().int().positive().optional(),
+  nombre: z.string(),
+  logo: z.string().optional(),
+  idUsuario: z.number().int().positive()
+});
 
-module.exports = Gimnasio;
+module.exports = gimnasioSchema;

@@ -1,17 +1,16 @@
-class Usuario {
-  id;
-  nombre;
-  apellido;
-  mail;
-  password;
+const z = require('zod');
 
-  constructor(id, nombre, apellido, mail, password) {
-    this.id = id;
-    this.nombre = nombre;
-    this.apellido = apellido;
-    this.mail = mail;
-    this.password = password;
-  }
-}
+const usuarioSchema = z.object({
+  id: z.number().int().positive().optional(),
+  nombre: z.string(),
+  apellido: z.string(),
+  mail: z.string().email(),
+  password: z.string()
+});
 
-module.exports = Usuario;
+const loginschema = z.object({
+  mail: z.string().email(),
+  password: z.string()
+});
+
+module.exports = { usuarioSchema, loginschema };
