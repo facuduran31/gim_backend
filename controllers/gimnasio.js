@@ -22,13 +22,25 @@ class GimnasioController {
         });
     }
 
+
+    getGimnasioByUser = (req, res) => {
+        const idUsuario = req.params.idUsuario;
+        gimnasioModel.getGimnasioByUser(idUsuario, (err, data) => {
+            if (err) {
+                res.status(500).json({ message: 'Error al obtener el gimnasio' });
+            } else {
+                res.json(data);
+            }
+        });
+    }
+
     createGimnasio = (req, res) => {
         const gimnasio = req.body;
         gimnasioModel.createGimnasio(gimnasio, (err, data) => {
             if (err) {
                 res.status(500).json({ message: 'Error al crear el gimnasio' });
             } else {
-                res.json({message: 'Gimnasio creado correctamente'});
+                res.json({ message: 'Gimnasio creado correctamente' });
             }
         });
     }
@@ -41,7 +53,7 @@ class GimnasioController {
                 res.status(500).json({ message: 'Error al actualizar el gimnasio' });
                 console.log(err);
             } else {
-                res.json({message: 'Gimnasio actualizado correctamente'});
+                res.json({ message: 'Gimnasio actualizado correctamente' });
             }
         });
     }
@@ -52,7 +64,7 @@ class GimnasioController {
             if (err) {
                 res.status(500).json({ message: 'Error al eliminar el gimnasio' });
             } else {
-                res.json({message: 'Gimnasio eliminado correctamente'});
+                res.json({ message: 'Gimnasio eliminado correctamente' });
             }
         });
     }
