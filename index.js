@@ -16,9 +16,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res)=>{
-    res.send('hola');
-})
+app.get('/', (req, res) => {
+    return res.sendFile(__dirname + '/index.html');
+});
+
+
 
 
 //Definicón de rutas

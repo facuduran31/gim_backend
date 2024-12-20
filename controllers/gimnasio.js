@@ -1,5 +1,6 @@
 const gimnasioModel = require('../models/gimnasio');
 const gimnasioSchema = require('../interfaces/gimnasio');
+const { deleteFile } = require('../middlewares/multer');
 
 class GimnasioController {
     getAllGimnasios = (req, res) => {
@@ -37,6 +38,8 @@ class GimnasioController {
 
     createGimnasio = (req, res) => {
         const gimnasio = req.body;
+        gimnasio.idUsuario = parseInt(req.body.idUsuario);
+        gimnasio.logo = req.file.filename;
         const gimnasioValido = gimnasioSchema.safeParse(gimnasio);
         if (gimnasioValido.success) {
             gimnasioModel.createGimnasio(gimnasio, (err, data) => {
@@ -48,39 +51,93 @@ class GimnasioController {
             });
         }
         else {
+            deleteFile(req.file.path);
             res.status(400).json({ message: gimnasioValido.error.errors[0].message });
         }
     }
 
     updateGimnasio = (req, res) => {
-        const gimnasio = req.body;
-        gimnasio.id = parseInt(req.params.id);
-        const gimnasioValido = gimnasioSchema.safeParse(gimnasio);
-        if (gimnasioValido.success) {
-            gimnasioModel.updateGimnasio(gimnasio, (err, data) => {
-                if (err) {
-                    res.status(500).json({ message: 'Error al actualizar el gimnasio' });
-                    console.log(err);
-                } else {
-                    res.json({ message: 'Gimnasio actualizado correctamente' });
+        const datosNuevos = req.body;
+        datosNuevos.id = parseInt(req.params.id);
+
+
+        gimnasioModel.getGimnasioById(datosNuevos.id, (err, gimnasio) => {
+            if (err) {
+                return res.status(500).json({ message: 'Error al actualizar el gimnasio' });
+            }
+            if (!gimnasio) {
+                return res.status(404).json({ message: 'Gimnasio no encontrado' });
+            }
+
+            const gimnasioActualizado = {
+                ...gimnasio[0], // Mantener los campos existentes
+                ...datosNuevos // Sobrescribir con los datos enviados
+            };
+
+
+
+            const gimnasioValido = gimnasioSchema.safeParse(gimnasioActualizado);
+            if (gimnasioValido.success) {
+
+                if (datosNuevos.logo) {
+                    gimnasioModel.getGimnasioById(id, (err, gimnasio) => {
+                        if (err) {
+                            return res.status(500).json({ message: 'Error al eliminar el gimnasio' });
+                        }
+
+                        if (!gimnasio) {
+                            return res.status(404).json({ message: 'Gimnasio no encontrado' });
+                        }
+
+                        if (gimnasio[0].logo) {
+                            deleteFile(gimnasio[0].logo);
+                        }
+                    });
                 }
-            });
-        }
-        else {
-            res.status(400).json({ message: gimnasioValido.error.errors[0].message });
-        }
 
-
+                gimnasioModel.updateGimnasio(gimnasioActualizado, (err, data) => {
+                    if (err) {
+                        res.status(500).json({ message: 'Error al actualizar el gimnasio' });
+                        console.log(err);
+                    } else {
+                        res.json({ message: 'Gimnasio actualizado correctamente' });
+                    }
+                });
+            }
+            else {
+                res.status(400).json({ message: gimnasioValido.error.errors[0].message });
+            }
+        });
     }
 
     deleteGimnasio = (req, res) => {
         const id = req.params.id;
-        gimnasioModel.deleteGimnasio(id, (err, data) => {
+
+
+        gimnasioModel.getGimnasioById(id, (err, gimnasio) => {
             if (err) {
-                res.status(500).json({ message: 'Error al eliminar el gimnasio' });
-            } else {
-                res.json({ message: 'Gimnasio eliminado correctamente' });
+                return res.status(500).json({ message: 'Error al eliminar el gimnasio' });
             }
+
+            if (!gimnasio) {
+                return res.status(404).json({ message: 'Gimnasio no encontrado' });
+            }
+
+            if (gimnasio[0].logo) {
+                deleteFile(gimnasio[0].logo);
+            }
+
+
+
+
+            gimnasioModel.deleteGimnasio(id, (err, data) => {
+                if (err) {
+                    res.status(500).json({ message: 'Error al eliminar el gimnasio' });
+                } else {
+
+                    res.json({ message: 'Gimnasio eliminado correctamente' });
+                }
+            });
         });
     }
 }
