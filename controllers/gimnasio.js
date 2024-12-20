@@ -39,7 +39,7 @@ class GimnasioController {
     createGimnasio = (req, res) => {
         const gimnasio = req.body;
         gimnasio.idUsuario = parseInt(req.body.idUsuario);
-        gimnasio.logo = req.file.filename;
+        gimnasio.logo = req.file?.filename || undefined;
         const gimnasioValido = gimnasioSchema.safeParse(gimnasio);
         if (gimnasioValido.success) {
             gimnasioModel.createGimnasio(gimnasio, (err, data) => {
@@ -51,7 +51,10 @@ class GimnasioController {
             });
         }
         else {
-            deleteFile(req.file.path);
+            if (gimnasio.logo) {
+                deleteFile(req.file.path);
+            }
+            console.log(gimnasioValido.error.errors[0].message);
             res.status(400).json({ message: gimnasioValido.error.errors[0].message });
         }
     }
