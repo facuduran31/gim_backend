@@ -14,7 +14,6 @@ class gimnasioModel {
     }
 
     createGimnasio = (gimnasio, callback) => {
-        console.log(gimnasio);
         db.query('INSERT INTO gimnasio (nombre, logo, idUsuario) VALUES (?, ?, ?)', [gimnasio.nombre, gimnasio.logo, gimnasio.idUsuario], callback);
     }
 
