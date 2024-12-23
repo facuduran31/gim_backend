@@ -26,6 +26,17 @@ class planController {
         );
     }
 
+    getPlanesByGimnasio = (req, res) => {
+        const idGimnasio = req.params.idGimnasio;
+        planModel.getPlanesByGimnasio(idGimnasio, (err, data) => {
+            if (err) {
+                res.status(500).json({ error: 'Error al obtener los planes' });
+            } else {
+                res.status(200).json(data);
+            }
+        });
+    }
+
 
     createPlan = (req, res) => {
         const plan = req.body;
