@@ -5,6 +5,7 @@ const planController = require('../controllers/plan');
 
 router.get('/', planController.getAllPlanes);
 router.get('/:id', planController.getPlanById);
+router.get('/gimnasio/:idGimnasio', planController.getPlanesByGimnasio);
 router.post('/', planController.createPlan);
 router.put('/:id', planController.updatePlan);
 router.delete('/:id', planController.deletePlan);
