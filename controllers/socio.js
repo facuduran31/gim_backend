@@ -24,6 +24,17 @@ class SocioController {
         })
     }
 
+    getSociosByGimnasio = (req, res) => {
+        const idGimnasio = req.params.idGimnasio;
+        socioModel.getSociosByGimnasio(idGimnasio, (err, data) => {
+            if (err) {
+                res.status(500).json({ error: 'Error al obtener los socios' });
+            } else {
+                res.status(200).json(data);
+            }
+        })
+    }
+
     createSocio = (req, res) => {
         const socio = req.body;
 
