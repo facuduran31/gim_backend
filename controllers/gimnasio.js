@@ -52,16 +52,23 @@ class GimnasioController {
         }
         else {
             if (gimnasio.logo) {
-                deleteFile(req.file.path);
+                deleteFile(req.file.filename);
             }
             console.log(gimnasioValido.error.errors[0].message);
             res.status(400).json({ message: gimnasioValido.error.errors[0].message });
         }
     }
 
+
+
     updateGimnasio = (req, res) => {
         const datosNuevos = req.body;
+        if(datosNuevos.idUsuario){
+            datosNuevos.idUsuario = parseInt(req.body.idUsuario);
+        }
+
         datosNuevos.id = parseInt(req.params.id);
+        datosNuevos.logo = req.file?.filename || undefined;
 
 
         gimnasioModel.getGimnasioById(datosNuevos.id, (err, gimnasio) => {
@@ -76,26 +83,16 @@ class GimnasioController {
                 ...gimnasio[0], // Mantener los campos existentes
                 ...datosNuevos // Sobrescribir con los datos enviados
             };
+            console.log(gimnasio[0]);
+            console.log(gimnasioActualizado);
 
 
 
             const gimnasioValido = gimnasioSchema.safeParse(gimnasioActualizado);
             if (gimnasioValido.success) {
 
-                if (datosNuevos.logo) {
-                    gimnasioModel.getGimnasioById(id, (err, gimnasio) => {
-                        if (err) {
-                            return res.status(500).json({ message: 'Error al eliminar el gimnasio' });
-                        }
-
-                        if (!gimnasio) {
-                            return res.status(404).json({ message: 'Gimnasio no encontrado' });
-                        }
-
-                        if (gimnasio[0].logo) {
-                            deleteFile(gimnasio[0].logo);
-                        }
-                    });
+                if (req.file && gimnasio[0].logo) {
+                    deleteFile(gimnasio[0].logo);
                 }
 
                 gimnasioModel.updateGimnasio(gimnasioActualizado, (err, data) => {
@@ -106,8 +103,11 @@ class GimnasioController {
                         res.json({ message: 'Gimnasio actualizado correctamente' });
                     }
                 });
-            }
-            else {
+            }else {
+                if(req.file){
+
+                    deleteFile(req.file.filename);
+                }
                 res.status(400).json({ message: gimnasioValido.error.errors[0].message });
             }
         });
