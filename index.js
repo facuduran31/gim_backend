@@ -5,6 +5,9 @@ const usuarioRouter = require('./routes/usuario');
 const socioRouter = require('./routes/socio');
 const planRouter = require('./routes/plan');
 const inscripcionRouter = require('./routes/inscripcion');
+const passport = require('passport');
+const session = require('express-session');
+require('./middlewares/passport');
 
 require('dotenv').config();
 const port = process.env.PORT;
@@ -12,12 +15,46 @@ const port = process.env.PORT;
 
 const app = express();
 
+
 //Middlewares
+app.use(session({ secret: 'cats', resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(cors());
 app.use(express.json());
 
 
 
+// ### LOGIN MANEJADO POR GOOGLE (NO SE COMO PONERLO EN EL CONTROLADOR) ###
+
+// function isLoggedIn(req, res, next) {
+//     req.user ? next() : res.sendStatus(401);
+//   }
+
+
+app.get('/', (req, res) => {
+    res.send('<a href="/auth/google">Authenticate with Google</a>');
+  });
+  
+  app.get('/auth/google',
+    passport.authenticate('google', { scope: [ 'email', 'profile' ] }
+  ));
+  
+  app.get( '/auth/google/callback',
+    passport.authenticate( 'google', {
+      successRedirect: '/success',
+      failureRedirect: '/auth/google/failure'
+    })
+  );
+
+  // app.get('/success', isLoggedIn, (req, res) => {
+  //   res.send(`Hello ${req.user.displayName}`);
+  // });
+
+
+  // app.get('/auth/google/failure', (req, res) => {
+  //   res.send('Failed to authenticate..');
+  // });
 
 
 
