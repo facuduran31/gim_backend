@@ -1,5 +1,6 @@
 const UsuarioModel = require('../models/usuario.js');
 const { generateToken } = require('../middlewares/token.js');
+const passport = require('passport');
 const { usuarioSchema, loginschema } = require('../interfaces/usuario.js');
 
 class UsuarioController {
@@ -77,29 +78,31 @@ class UsuarioController {
         });
     }
 
-    login(req, res) {
-        const mail = req.body.mail;
-        const password = req.body.password;
-        const loginValido = loginschema.safeParse({ mail, password });
-        if (loginValido.success) {
-            UsuarioModel.login(mail, password, (err, data) => {
-                if (err) {
-                    res.status(500).json({ error: 'Error al iniciar sesión' });
-                } else {
+    login=(req, res)=> {
+        // console.log(req.cookie);
+        res.json({ message: 'Login' });
+        // const mail = req.body.mail;
+        // const password = req.body.password;
+        // const loginValido = loginschema.safeParse({ mail, password });
+        // if (loginValido.success) {
+        //     UsuarioModel.login(mail, password, (err, data) => {
+        //         if (err) {
+        //             res.status(500).json({ error: 'Error al iniciar sesión' });
+        //         } else {
 
-                    if (data.length > 0) {
-                        const payload = data[0];
-                        const token = generateToken(payload);
-                        res.json({ token, user: data[0] });
-                    } else {
-                        res.status(404).send({ error: 'Usuario no encontrado' });
-                    }
+        //             if (data.length > 0) {
+        //                 const payload = data[0];
+        //                 const token = generateToken(payload);
+        //                 res.json({ token, user: data[0] });
+        //             } else {
+        //                 res.status(404).send({ error: 'Usuario no encontrado' });
+        //             }
 
-                }
-            });
-        } else {
-            res.status(400).json({ error: loginValido.error.errors[0].message });
-        }
+        //         }
+        //     });
+        // } else {
+        //     res.status(400).json({ error: loginValido.error.errors[0].message });
+        // }
     }
 
 
@@ -115,6 +118,40 @@ class UsuarioController {
         });
     }
 
+
+
+
+    // handleGoogleSignIn=(response)=> {
+    //     if (response.error) {
+    //         // Handle errors (e.g., user cancellation, network issues)
+    //         console.error('Error signing in:', response.error);
+    //     } else {
+    //         // Access user profile information
+    //         const accessToken = response.credential;
+    
+    //         // Use the access token to retrieve user profile data
+    //         fetch('https://www.googleapis.com/userinfo/v2/me', {
+    //             headers: {
+    //                 Authorization: `Bearer ${accessToken}`
+    //             }
+    //         })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             // Extract the desired user profile information (e.g., name, email)
+    //             console.log('User profile:', data);
+    //             // Use the information as needed (e.g., display on your website, store securely)
+    //         })
+    //         .catch(error => {
+    //             // Handle errors during profile data retrieval
+    //             console.error('Error fetching user profile:', error);
+    //         });
+    //     }
+    // }
+
+
+
+
+    
 
 }
 
