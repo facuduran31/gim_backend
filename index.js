@@ -47,14 +47,14 @@ app.get('/', (req, res) => {
     })
   );
 
-  // app.get('/success', isLoggedIn, (req, res) => {
-  //   res.send(`Hello ${req.user.displayName}`);
-  // });
+  app.get('/success', (req, res) => {
+    res.send(`Hello ${req.user.nombre}`);
+  });
 
 
-  // app.get('/auth/google/failure', (req, res) => {
-  //   res.send('Failed to authenticate..');
-  // });
+  app.get('/auth/google/failure', (req, res) => {
+    res.send('Failed to authenticate..');
+  });
 
 
 

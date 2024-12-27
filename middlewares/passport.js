@@ -1,5 +1,6 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
+const db = require('../models/db');
 
 
 
@@ -10,9 +11,27 @@ passport.use(new GoogleStrategy({
   passReqToCallback: true,
 },
 function(request, accessToken, refreshToken, profile, done) {
-    //aca poner manejo en base de datos
-    console.log(profile);
-  return done(null, profile);
+    
+    db.query('SELECT * FROM usuario WHERE mail = ?', [profile.email], (err, user) => { //Chequea si el usuario ya existe en la base de datos
+      if (err) { //Si hay un error, lo devuelve
+        return done(err, false);
+      }
+      if (!err && user.length!=0) { //Si no hay error y el usuario ya existe, lo devuelve
+        return done(null, user[0]);
+      } else {
+        db.query('INSERT INTO usuario (mail, nombre, apellido) VALUES (?, ?, ?)', [profile.email, profile.given_name, profile.family_name], (err, userAdded) => { //Si no existe, lo agrega a la base de datos
+          if (err) { //Si hay un error, lo devuelve
+            return done(err, false);
+          } else {
+            db.query('SELECT * FROM usuario WHERE mail = ?', [profile.email], (err, user) => { //Busca el usuario recién creado en la base de datos
+              if (err) { //Si hay un error, lo devuelve
+                return done(err, false);
+              }
+              return done(null, user[0]); //Si no hay error, devuelve el usuario
+            });
+          }});
+      }
+    });
 }));
 
 passport.serializeUser(function(user, done) {
