@@ -8,6 +8,7 @@ const inscripcionRouter = require('./routes/inscripcion');
 const passport = require('passport');
 const session = require('express-session');
 require('./middlewares/passport');
+const {generateToken} = require('./middlewares/token');
 
 require('dotenv').config();
 const port = process.env.PORT;
@@ -40,21 +41,18 @@ app.get('/', (req, res) => {
     passport.authenticate('google', { scope: [ 'email', 'profile' ] }
   ));
   
-  app.get( '/auth/google/callback',
-    passport.authenticate( 'google', {
-      successRedirect: '/success',
-      failureRedirect: '/auth/google/failure'
-    })
-  );
+  app.get( '/auth/google/callback', passport.authenticate("google",),(req, res)=> {
+    if(req.user){
+      const payload = req.user;
+      const token = generateToken(payload);
+      res.json({ token, user: req.user });
+    }
+    else{
+      res.status(404).send({ error: 'Usuario no encontrado' });
+    }
+     });
 
-  app.get('/success', (req, res) => {
-    res.send(`Hello ${req.user.nombre}`);
-  });
 
-
-  app.get('/auth/google/failure', (req, res) => {
-    res.send('Failed to authenticate..');
-  });
 
 
 

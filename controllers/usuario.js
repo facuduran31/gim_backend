@@ -1,7 +1,5 @@
 const UsuarioModel = require('../models/usuario.js');
 const { generateToken } = require('../middlewares/token.js');
-const passport = require('passport');
-const session = require('express-session');
 const { usuarioSchema, loginschema } = require('../interfaces/usuario.js');
 
 class UsuarioController {

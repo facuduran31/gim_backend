@@ -1,6 +1,7 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
 const db = require('../models/db');
+const { v4: uuidv4 } = require('uuid');
 
 
 
@@ -19,7 +20,8 @@ function(request, accessToken, refreshToken, profile, done) {
       if (!err && user.length!=0) { //Si no hay error y el usuario ya existe, lo devuelve
         return done(null, user[0]);
       } else {
-        db.query('INSERT INTO usuario (mail, nombre, apellido) VALUES (?, ?, ?)', [profile.email, profile.given_name, profile.family_name], (err, userAdded) => { //Si no existe, lo agrega a la base de datos
+        const password = uuidv4();
+        db.query('INSERT INTO usuario (mail, nombre, apellido, password) VALUES (?, ?, ?, ?)', [profile.email, profile.given_name, profile.family_name, password], (err, userAdded) => { //Si no existe, lo agrega a la base de datos
           if (err) { //Si hay un error, lo devuelve
             return done(err, false);
           } else {

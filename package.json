@@ -19,6 +19,7 @@
     "mysql2": "^3.11.5",
     "passport": "^0.7.0",
     "passport-google-oauth2": "^0.2.0",
+    "uuid": "^11.0.3",
     "zod": "^3.24.1"
   },
   "devDependencies": {
