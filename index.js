@@ -12,13 +12,14 @@ const {generateToken} = require('./middlewares/token');
 
 require('dotenv').config();
 const port = process.env.PORT;
+const expressSessionSecret = process.env.EXPRESS_SESSION_SECRET;
 
 
 const app = express();
 
 
 //Middlewares
-app.use(session({ secret: 'cats', resave: false, saveUninitialized: true }));
+app.use(session({ secret: expressSessionSecret, resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors());
@@ -26,7 +27,7 @@ app.use(express.json());
 
 
 
-// ### LOGIN MANEJADO POR GOOGLE (NO SE COMO PONERLO EN EL CONTROLADOR) ###
+//LOGIN MANEJADO POR GOOGLE
   
   app.get('/auth/google',
     passport.authenticate('google', { scope: [ 'email', 'profile' ] }
@@ -34,7 +35,7 @@ app.use(express.json());
   
   app.get( '/auth/google/callback', passport.authenticate("google",),(req, res)=> {
     if(req.user){
-      const payload = req.user;
+      const payload = req.user; //Hace falta mandar la contra o la puedo sacar?
       const token = generateToken(payload);
       res.json({ token, user: req.user });
     }
