@@ -29,15 +29,6 @@ app.use(passport.session());
 app.use(cors({
   origin: frontUrl, // Permitir el origen del frontend
   credentials: true, // Permitir envío de cookies y cabeceras de autenticación
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
-  allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
-}));
-
-app.options('*', cors({
-  origin: frontUrl,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 app.use(express.json());
@@ -61,13 +52,17 @@ app.use(express.json());
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
             sameSite: 'strict',
+            maxAge: 1000 * 60 * 60 * 24 // 24 horas
           })
           .cookie('user', JSON.stringify(user), {
             httpOnly: false,
             secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
             sameSite: 'strict',
+            maxAge: 1000 * 60 * 60 * 24 // 24 horas
           })
           .redirect(`${frontUrl}/main`);
+          // .send({ message: 'Sesión iniciada correctamente' }); ver si puedo usar esto mejor
+
       
     }
     else{
@@ -75,18 +70,7 @@ app.use(express.json());
     }
      });
 
-  app.post('/logout', (req, res) => { //Termino la sesion y borro las cookies
-    
-    req.logout(function(err) {
-      if (err) { return next(err); }
-      req.session.destroy();
-      res
-        .clearCookie('authToken',{path: '/', domain:'localhost', httpOnly: true, sameSite: 'strict', secure: process.env.NODE_ENV === 'production'})
-        .clearCookie('user',{path: '/', domain:'localhost', httpOnly: false, sameSite: 'strict', secure: process.env.NODE_ENV === 'production'})
-        .send({ message: 'Sesión cerrada correctamente' });
-    });
-   
-  });
+
 
 
 
