@@ -77,7 +77,7 @@ class UsuarioController {
         });
     }
 
-    login(req, res) {
+    login=(req, res)=> {
         const mail = req.body.mail;
         const password = req.body.password;
         const loginValido = loginschema.safeParse({ mail, password });
@@ -90,7 +90,22 @@ class UsuarioController {
                     if (data.length > 0) {
                         const payload = data[0];
                         const token = generateToken(payload);
-                        res.json({ token, user: data[0] });
+                        const user = {id: payload.idUsuario, mail: payload.mail, nombre: payload.nombre, apellido: payload.apellido};
+                        req.session.user = user;
+                        req.session.save();
+
+                        res
+                            .cookie('authToken', token, {
+                                httpOnly: true,
+                                secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
+                                sameSite: 'strict',
+                            })
+                            .cookie('user', JSON.stringify(user), {
+                                httpOnly: false,
+                                secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
+                                sameSite: 'strict',
+                            })
+                            .send({ message: 'Sesión iniciada correctamente' });
                     } else {
                         res.status(404).send({ error: 'Usuario no encontrado' });
                     }
@@ -101,6 +116,9 @@ class UsuarioController {
             res.status(400).json({ error: loginValido.error.errors[0].message });
         }
     }
+
+
+
 
 
     searchDuplicateMail = async (mail) => {
@@ -115,6 +133,10 @@ class UsuarioController {
         });
     }
 
+
+
+
+    
 
 }
 
