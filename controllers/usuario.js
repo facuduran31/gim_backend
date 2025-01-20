@@ -99,11 +99,13 @@ class UsuarioController {
                                 httpOnly: true,
                                 secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
                                 sameSite: 'strict',
+                                maxAge: 1000 * 60 * 60 * 24 // 24 horas
                             })
                             .cookie('user', JSON.stringify(user), {
                                 httpOnly: false,
                                 secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
                                 sameSite: 'strict',
+                                maxAge: 1000 * 60 * 60 * 24 // 24 horas
                             })
                             .send({ message: 'Sesión iniciada correctamente' });
                     } else {
@@ -116,6 +118,23 @@ class UsuarioController {
             res.status(400).json({ error: loginValido.error.errors[0].message });
         }
     }
+
+
+
+    logout=(req, res) => { //Termino la sesion y borro las cookies
+    
+        req.logout(function(err) {
+          if (err) { return next(err); }
+          req.session.destroy();
+          res
+            .clearCookie('authToken',{path: '/', domain:'localhost', httpOnly: true, sameSite: 'strict', secure: process.env.NODE_ENV === 'production'})
+            .clearCookie('user',{path: '/', domain:'localhost', httpOnly: false, sameSite: 'strict', secure: process.env.NODE_ENV === 'production'})
+            .clearCookie('connect.sid',{path: '/', domain:'localhost', httpOnly: true, sameSite: 'strict', secure: process.env.NODE_ENV === 'production'})
+            .send({ message: 'Sesión cerrada correctamente' });
+        });
+       
+      };
+    
 
 
 
