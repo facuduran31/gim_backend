@@ -11,9 +11,11 @@ require('./middlewares/passport');
 const {generateToken} = require('./middlewares/token');
 const cookieParser = require('cookie-parser');
 
+//Variables de entorno
 require('dotenv').config();
 const port = process.env.PORT;
 const expressSessionSecret = process.env.EXPRESS_SESSION_SECRET;
+const frontUrl= process.env.FRONT_URL;
 
 
 const app = express();
@@ -25,14 +27,14 @@ app.use(session({ secret: expressSessionSecret, resave: false, saveUninitialized
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors({
-  origin: 'http://localhost:4200', // Permitir el origen del frontend
+  origin: frontUrl, // Permitir el origen del frontend
   credentials: true, // Permitir envío de cookies y cabeceras de autenticación
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
   allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
 }));
 
 app.options('*', cors({
-  origin: 'http://localhost:4200',
+  origin: frontUrl,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -65,7 +67,7 @@ app.use(express.json());
             secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
             sameSite: 'strict',
           })
-          .redirect(`http://localhost:4200/main`);
+          .redirect(`${frontUrl}/main`);
       
     }
     else{
@@ -73,8 +75,8 @@ app.use(express.json());
     }
      });
 
-  app.post('/logout', (req, res) => {
-    //HAY QUE BORRAR LAS COOKIES
+  app.post('/logout', (req, res) => { //Termino la sesion y borro las cookies
+    
     req.logout(function(err) {
       if (err) { return next(err); }
       req.session.destroy();
