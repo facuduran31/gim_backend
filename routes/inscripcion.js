@@ -1,12 +1,12 @@
 const router = require('express').Router();
 const inscripcionController = require('../controllers/inscripcion');
-//const { validateToken } = require('../middlewares/token');
+const { validateToken } = require('../middlewares/token');
 
 
-router.get('/', inscripcionController.getAllInscripciones);
-router.get('/:idSocioPlan', inscripcionController.getInscripcionById);
-router.post('/', inscripcionController.createInscripcion);
-router.patch('/:idSocioPlan', inscripcionController.updateInscripcion);
-router.delete('/:idSocioPlan', inscripcionController.deleteInscripcion);
+router.get('/', validateToken, inscripcionController.getAllInscripciones);
+router.get('/:idSocioPlan', validateToken, inscripcionController.getInscripcionById);
+router.post('/', validateToken, inscripcionController.createInscripcion);
+router.patch('/:idSocioPlan', validateToken, inscripcionController.updateInscripcion);
+router.delete('/:idSocioPlan', validateToken, inscripcionController.deleteInscripcion);
 
 module.exports = router;
