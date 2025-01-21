@@ -22,11 +22,11 @@ class UsuarioModel {
         db.query('DELETE FROM usuario WHERE idUsuario = ?', [id], callback);
     }
 
-    login = (mail, password, callback) => {
-        db.query('SELECT * FROM usuario WHERE mail = ? AND password = ?', [mail, password], callback);
-    }
+    // login = (mail, password, callback) => {
+    //     db.query('SELECT * FROM usuario WHERE mail = ? AND password = ?', [mail, password], callback);
+    // }
 
-    searchDuplicateMail = (mail, callback) => {
+    getUserByMail = (mail, callback) => {
         db.query('SELECT * FROM usuario WHERE mail = ?', [mail], callback);
     }
 }

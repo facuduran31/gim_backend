@@ -1,6 +1,7 @@
 const UsuarioModel = require('../models/usuario.js');
 const { generateToken } = require('../middlewares/token.js');
 const { usuarioSchema, loginschema } = require('../interfaces/usuario.js');
+const bcrypt = require('bcrypt');
 
 class UsuarioController {
     getAllUsuarios = (req, res) => {
@@ -28,9 +29,11 @@ class UsuarioController {
         const usuario = req.body;
         const usuarioValido = usuarioSchema.safeParse(usuario);
         if (usuarioValido.success) {
-            const duplicado = await this.searchDuplicateMail(usuario.mail);
+            const duplicado = await this.getUserByMail(usuario.mail);
             if (!duplicado) {
-                UsuarioModel.createUsuario(usuario, (err, data) => {
+                const contraEncriptada= await bcrypt.hash(usuario.password, 10); //Encripto la contraseña
+                const usuarioEncriptado = {...usuario, password: contraEncriptada}; //Creo un nuevo objeto con la contraseña encriptada
+                UsuarioModel.createUsuario(usuarioEncriptado, (err, data) => {
                     if (err) {
                         res.status(500).json({ error: 'Error al crear el usuario' });
                     } else {
@@ -47,12 +50,14 @@ class UsuarioController {
 
     }
 
-    updateUsuario = (req, res) => {
+    updateUsuario = async (req, res) => {
         const usuario = req.body;
         usuario.id = parseInt(req.params.id);
         const usuarioValido = usuarioSchema.safeParse(usuario);
         if (usuarioValido.success) {
-            UsuarioModel.updateUsuario(usuario, (err, data) => {
+            const contraEncriptada= await bcrypt.hash(usuario.password, 10); //Encripto la contraseña
+            const usuarioEncriptado = {...usuario, password: contraEncriptada}; //Creo un nuevo objeto con la contraseña encriptada
+            UsuarioModel.updateUsuario(usuarioEncriptado, (err, data) => {
                 if (err) {
                     res.status(500).json({ error: 'Error al actualizar el usuario' });
                     console.log(err);
@@ -82,12 +87,22 @@ class UsuarioController {
         const password = req.body.password;
         const loginValido = loginschema.safeParse({ mail, password });
         if (loginValido.success) {
-            UsuarioModel.login(mail, password, (err, data) => {
+            
+            UsuarioModel.getUserByMail(mail, (err, data) => {
                 if (err) {
                     res.status(500).json({ error: 'Error al iniciar sesión' });
                 } else {
 
                     if (data.length > 0) {
+                        try{
+                            const isValid = bcrypt.compareSync(password, data[0].password);
+                            if (!isValid) {throw new Error('Contraseña incorrecta');}
+                        }
+                        catch(err){
+                            res.status(400).json({ error: 'Contraseña incorrecta' });
+                            return;
+                        }
+                        
                         const payload = data[0];
                         const token = generateToken(payload);
                         const user = {id: payload.idUsuario, mail: payload.mail, nombre: payload.nombre, apellido: payload.apellido};
@@ -140,9 +155,9 @@ class UsuarioController {
 
 
 
-    searchDuplicateMail = async (mail) => {
+      getUserByMail = async (mail) => {
         return new Promise((resolve, reject) => {
-            UsuarioModel.searchDuplicateMail(mail, (err, data) => {
+            UsuarioModel.getUserByMail(mail, (err, data) => {
                 if (err) {
                     reject('Error al buscar el mail');
                 } else {
