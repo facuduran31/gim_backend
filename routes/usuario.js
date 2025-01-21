@@ -1,13 +1,13 @@
 const router = require('express').Router();
 const usuarioController = require('../controllers/usuario');
-//const { validateToken } = require('../middlewares/token');
+const { validateToken } = require('../middlewares/token');
 
-router.get('/', usuarioController.getAllUsuarios);
-router.get('/:id', usuarioController.getUsuarioById);
+router.get('/', validateToken, usuarioController.getAllUsuarios);
+router.get('/:id', validateToken, usuarioController.getUsuarioById);
 router.post('/', usuarioController.createUsuario);
-router.put('/:id', usuarioController.updateUsuario);
-router.delete('/:id', usuarioController.deleteUsuario);
+router.put('/:id', validateToken, usuarioController.updateUsuario);
+router.delete('/:id', validateToken, usuarioController.deleteUsuario);
 router.post('/login', usuarioController.login);
-router.post('/logout', usuarioController.logout);
+router.post('/logout', validateToken, usuarioController.logout);
 
 module.exports = router;

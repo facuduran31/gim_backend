@@ -17,8 +17,8 @@ class inscripcionModel {
         db.query('UPDATE socio_plan SET fechaInicio = ?, fechaFin = ? WHERE idSocioPlan = ?', [inscripcion.fechaInicio, inscripcion.fechaFin, inscripcion.idSocioPlan,], callback);
     }
 
-    deleteInscripcion = (idSocio, idPlan, callback) => {
-        db.query('DELETE FROM socio_plan WHERE idSocioPlan = ?', [idSocio, idPlan], callback);
+    deleteInscripcion = (idSocioPlan, callback) => {
+        db.query('DELETE FROM socio_plan WHERE idSocioPlan = ?', [idSocioPlan], callback);
     }
 
 }
