@@ -15,7 +15,7 @@ class UsuarioModel {
     }
 
     updateUsuario = (usuario, callback) => {
-        db.query('UPDATE usuario SET nombre = ?, apellido = ?, mail = ?, password = ? WHERE idUsuario = ?', [usuario.nombre, usuario.apellido, usuario.mail, usuario.password, usuario.id], callback);
+        db.query('UPDATE usuario SET nombre = ?, apellido = ?, mail = ?, password = ? WHERE idUsuario = ?', [usuario.nombre, usuario.apellido, usuario.mail, usuario.password, usuario.idUsuario], callback);
     }
 
     deleteUsuario = (id, callback) => {
