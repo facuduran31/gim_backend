@@ -2,6 +2,9 @@ const UsuarioModel = require('../models/usuario.js');
 const { generateToken } = require('../middlewares/token.js');
 const { usuarioSchema, loginschema } = require('../interfaces/usuario.js');
 const bcrypt = require('bcrypt');
+const emailMiddleware = require('../middlewares/nodemailer.js');
+require('dotenv').config();
+const jwt = require('jsonwebtoken');
 
 class UsuarioController {
     getAllUsuarios = (req, res) => {
@@ -197,9 +200,62 @@ class UsuarioController {
     }
 
 
+    forgotPassword = async (req, res) => {
+        const mail = req.body.mail;
+        try {
+            
+            const user =  await new Promise((resolve, reject) => {
+                UsuarioModel.getUserByMail(mail, (err, data) => {
+                    if (err) {
+                        reject('Error al buscar el mail');
+                    } else {
+                        resolve(data);
+                    }
+                });
+            });
+            if (user) {
+                // Enviar mail
+                const resetToken = generateToken({ id:user[0].idUsuario, mail:user[0].mail });
+                const resetLink= process.env.FRONT_URL + '/reset-password/t=' + resetToken;
+                await emailMiddleware(user[0].mail, 'Recuperar contraseña', 'Haga click en el siguiente enlace para recuperar su contraseña: '+ resetLink);
+                res.json({ message: 'Se ha enviado un correo con las instrucciones para recuperar la contraseña' });
+            } else {
+                throw new Error('El mail no se encuentra registrado');
+            }
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+        
+    }
 
+    resetPassword = async (req, res) => {
+        const token = req.headers['authorization'].split(' ')[1];
+        const password = req.body.password;
+        const passEncriptada= await bcrypt.hash(password, 10); //Encripto la contraseña
+        try{
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    
+            UsuarioModel.getUsuarioById(decoded.id, (err, data) => {
+                if (err) {
+                    throw new Error('Error al buscar el usuario');
+                } else {
+                    if (data) {
+                        UsuarioModel.updateUsuario({...data[0], password: passEncriptada}, (err, user) => {
+                            if (err) {
+                                throw new Error('Error al cambiar la contraseña');
+                            } else {
+                                res.status(200).json({ message: 'Contraseña actualizada correctamente' });
+                            }
+                        });
+                    } else {
+                        res.status(404).json({ error: 'Usuario no encontrado' });
+                    }
+                }
+            });
+        }catch(err){
+            res.status(500).json({ error: 'Error al cambiar la contraseña' });
+        }
+    }
 
 }
 

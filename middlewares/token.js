@@ -9,8 +9,8 @@ const generateToken = (usuario) => {
 
 
 const validateToken = (req, res, next) => {
-  // const authHeader = req.headers['authorization'];
-  const token = req.cookies.authToken;
+
+  const token = req.cookies?.authToken || req.headers['authorization'];
   if (token) {
     jwt.verify(token, secret, (err, user) => {
       if (err) {
