@@ -69,6 +69,8 @@ class planController {
                 throw new Error(planValido.error.errors[0].message);
             }
         } catch (error) {
+            console.log(error);
+            
             res.status(500).json({ error: error.message });
         }
         
