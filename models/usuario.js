@@ -15,19 +15,19 @@ class UsuarioModel {
     }
 
     updateUsuario = (usuario, callback) => {
-        db.query('UPDATE usuario SET nombre = ?, apellido = ?, mail = ?, password = ? WHERE idUsuario = ?', [usuario.nombre, usuario.apellido, usuario.mail, usuario.password, usuario.idUsuario], callback);
+        db.query('UPDATE usuario SET nombre = ?, apellido = ?, mail = ? WHERE idUsuario = ?', [usuario.nombre, usuario.apellido, usuario.mail, usuario.id], callback);
     }
 
     deleteUsuario = (id, callback) => {
         db.query('DELETE FROM usuario WHERE idUsuario = ?', [id], callback);
     }
 
-    // login = (mail, password, callback) => {
-    //     db.query('SELECT * FROM usuario WHERE mail = ? AND password = ?', [mail, password], callback);
-    // }
-
     getUserByMail = (mail, callback) => {
         db.query('SELECT * FROM usuario WHERE mail = ?', [mail], callback);
+    }
+
+    updatePassword = (mail, password, callback) => {
+        db.query('UPDATE usuario SET password = ? WHERE mail = ?', [password, mail], callback);
     }
 }
 

@@ -74,9 +74,7 @@ class UsuarioController {
             usuario.id = parseInt(req.params.id);
             const usuarioValido = usuarioSchema.safeParse(usuario);
             if (usuarioValido.success) {
-                const contraEncriptada= await bcrypt.hash(usuario.password, 10); //Encripto la contraseña
-                const usuarioEncriptado = {...usuario, password: contraEncriptada}; //Creo un nuevo objeto con la contraseña encriptada
-                UsuarioModel.updateUsuario(usuarioEncriptado, (err, data) => {
+                UsuarioModel.updateUsuario(usuario, (err, data) => {
                     if (err) {
                         throw new Error('Error al actualizar el usuario');
                     } else {
@@ -242,7 +240,8 @@ class UsuarioController {
                     throw new Error('Error al buscar el usuario');
                 } else {
                     if (data) {
-                        UsuarioModel.updateUsuario({...data[0], password: passEncriptada}, (err, user) => {
+
+                        UsuarioModel.updatePassword(data[0].mail, passEncriptada, (err, user) => {
                             if (err) {
                                 throw new Error('Error al cambiar la contraseña');
                             } else {
@@ -255,7 +254,7 @@ class UsuarioController {
                 }
             });
         }catch(err){
-            res.status(500).json({ error: 'Error al cambiar la contraseña' });
+            res.status(500).json({ error: err.message });
         }
     }
 
