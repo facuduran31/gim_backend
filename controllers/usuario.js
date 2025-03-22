@@ -213,7 +213,9 @@ class UsuarioController {
                     }
                 });
             });
-            if (user) {
+            
+            if (user.length > 0) {
+                
                 // Enviar mail
                 const resetToken = generateToken({ id:user[0].idUsuario, mail:user[0].mail });
                 const resetLink= process.env.FRONT_URL + '/reset-password/t=' + resetToken;
