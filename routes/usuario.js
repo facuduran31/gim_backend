@@ -11,6 +11,6 @@ router.post('/login', usuarioController.login);
 router.post('/logout', validateToken, usuarioController.logout);
 router.post('/request-password-reset', usuarioController.forgotPassword);
 router.post('/password-reset', usuarioController.resetPassword);
-
+router.post('/send-email', usuarioController.sendEmail);
 
 module.exports = router;

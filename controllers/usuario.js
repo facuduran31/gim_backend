@@ -6,6 +6,9 @@ const emailMiddleware = require('../middlewares/nodemailer.js');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 
+const mailContacto = process.env.MAIL_CONTACTO;
+
+
 class UsuarioController {
     getAllUsuarios = (req, res) => {
         try {
@@ -255,6 +258,22 @@ class UsuarioController {
             });
         }catch(err){
             res.status(500).json({ error: err.message });
+        }
+    }
+
+    sendEmail = async (req, res) => {
+        const { email, subject, message } = req.body;
+        const fullMessage = 'Correo: ' + email + '\n' + message;
+        
+
+        try {
+            if (!email || !subject || !message) {
+                throw new Error('Faltan datos para enviar el correo');
+            }
+            await emailMiddleware(mailContacto, subject, fullMessage);
+            res.status(200).json({ message: 'Correo enviado correctamente' });
+        } catch (error) {
+            res.status(500).json({ error: 'Error al enviar el correo' });
         }
     }
 
