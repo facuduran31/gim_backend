@@ -10,7 +10,7 @@ class SocioModel{
     }
 
     getSociosByGimnasio = (idGimnasio, callback) => {
-        db.query("select s.idSocio, s.nombre, s.apellido, s.dni, s.telefono, s.activo from gimnasio g inner join plan p on g.idGimnasio=p.idGimnasio inner join socio_plan sp on p.idPlan=sp.idPlan inner join socio s on sp.idSocio=s.idSocio where g.idGimnasio=?;", [idGimnasio], callback);
+        db.query("select distinct s.idSocio, s.nombre, s.apellido, s.dni, s.telefono, s.activo from gimnasio g inner join plan p on g.idGimnasio=p.idGimnasio inner join socio_plan sp on p.idPlan=sp.idPlan inner join socio s on sp.idSocio=s.idSocio where g.idGimnasio=?;", [idGimnasio], callback);
     }
 
     createSocio = (socio, callback) => {

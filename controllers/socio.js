@@ -52,6 +52,7 @@ class SocioController {
 
     createSocio = (req, res) => {
         const socio = req.body;
+        socio.activo=socio.estado;
         try {
             const socioValido = socioSchema.safeParse(socio);
             if (socioValido.success) {
@@ -67,6 +68,7 @@ class SocioController {
                 throw new Error(socioValido.error.errors[0].message);
             }
         } catch (error) {
+            console.log(error)
             res.status(500).json({ error: error.message });            
         }
         
