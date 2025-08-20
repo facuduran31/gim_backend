@@ -25,7 +25,7 @@ class inscripcionController {
                 if (err) {
                     throw new Error('Error al obtener la inscripción');
                 } else {
-                    res.status(200).json(data);
+                    res.status(200).json(data[0]);
                 }
             });
         } catch (error) {
@@ -109,6 +109,8 @@ class inscripcionController {
         try {
             inscripcionModel.deleteInscripcion(idSocioPlan, (err, data) => {
                 if (err) {
+                        console.log(err)
+
                     throw new Error('Error al eliminar la inscripcion');
                 } else {
                     res.status(200).json({ message: 'Inscripcion eliminada con éxito' });

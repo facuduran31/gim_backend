@@ -25,7 +25,7 @@ class GimnasioController {
                 if (err) {
                     throw new Error('Error al obtener el gimnasio');
                 } else {
-                    res.json(data);
+                    res.json(data[0]);
                 }
             });
         } catch (error) {

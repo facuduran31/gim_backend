@@ -25,7 +25,7 @@ class SocioController {
                 if (err) {
                     throw new Error('Error al obtener el socio');
                 } else {
-                    res.status(200).json(data);
+                    res.status(200).json(data[0]);
                 }
             });
         } catch (error) {
