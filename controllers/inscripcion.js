@@ -23,7 +23,7 @@ class inscripcionController {
         try {
             inscripcionModel.getInscripcionById(idSocioPlan, (err, data) => {
                 if (err) {
-                    throw new Error('Error al obtener la inscripcion');
+                    throw new Error('Error al obtener la inscripción');
                 } else {
                     res.status(200).json(data);
                 }
@@ -33,6 +33,25 @@ class inscripcionController {
             
         }
         
+    }
+
+
+    getInscripcionesByIdGimnasio = (req, res)=>{
+        const idGimnasio=req.params.idGimnasio;
+        try{
+            inscripcionModel.getInscripcionesByIdGimnasio(idGimnasio,(err, data)=>{
+                if(err){
+                     throw new Error('Error al obtener las inscripciones');
+                }
+                else {
+                    res.status(200).json(data);
+                }
+            })
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+            
+        }
     }
 
     createInscripcion = (req, res) => {
