@@ -57,9 +57,10 @@ class inscripcionController {
     createInscripcion = (req, res) => {
         const inscripcion = req.body;
         try {
+            console.log(inscripcion)
             const inscripcionValida = inscripcionSchema.safeParse(inscripcion);
+            console.log(inscripcionValida)
             if (inscripcionValida.success) {
-
                 inscripcionModel.createInscripcion(inscripcion, (err, data) => {
                     if (err) {
                         throw new Error('Error al crear la inscripcion');
@@ -72,6 +73,7 @@ class inscripcionController {
                 throw new Error(inscripcionValida.error.errors[0].message);
             }
         } catch (error) {
+            console.log(error)
                 res.status(500).json({ error: error.message });
         }
         
