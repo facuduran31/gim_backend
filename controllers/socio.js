@@ -133,10 +133,15 @@ class SocioController {
         try {
             socioModel.validarIngreso(dni, (err, data) => {
                 if (err) {
-                    console.log('ss')
                     throw new Error("Error al validar el ingreso")
                 } else {
-                    res.status(200).json("Ingreso validado correctamente")
+                    if (data.length != 0) {
+                        res.status(200).json("Ingreso validado correctamente")
+                    }
+                    else {
+                        res.status(400).json("Ingreso no autorizado")
+
+                    }
                 }
             })
         } catch (error) {

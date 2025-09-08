@@ -29,7 +29,7 @@ class SocioModel {
         db.query('DELETE FROM socio WHERE idSocio = ?', [id], callback);
     }
 
-    validarIngresos = (dni, callback) => {
+    validarIngreso = (dni, callback) => {
         db.query('SELECT * FROM socio s INNER JOIN socio_plan sp ON s.idSocio = sp.idSocio INNER JOIN plan p ON p.idPlan = sp.idPlan INNER JOIN gimnasio g ON g.idGimnasio = p.idGimnasio WHERE s.dni = ?;', [dni], callback)
     }
 }
