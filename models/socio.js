@@ -1,6 +1,6 @@
 const db = require('./db.js');
 
-class SocioModel{
+class SocioModel {
     getAllSocios = (callback) => {
         db.query('SELECT * FROM socio', callback);
     }
@@ -9,12 +9,12 @@ class SocioModel{
         db.query('SELECT * FROM socio WHERE idSocio = ?', [id], callback);
     }
 
-     getSocioByDni = (dni, callback) => {
+    getSocioByDni = (dni, callback) => {
         db.query('SELECT * FROM socio WHERE dni = ?', [dni], callback);
     }
 
     getSociosByGimnasio = (idGimnasio, callback) => {
-        db.query("select distinct s.idSocio, s.nombre, s.apellido, s.dni, s.telefono, s.activo from gimnasio g inner join plan p on g.idGimnasio=p.idGimnasio inner join socio_plan sp on p.idPlan=sp.idPlan inner join socio s on sp.idSocio=s.idSocio where g.idGimnasio=?;", [idGimnasio], callback);
+        db.query("select distinct s.idSocio, s.nombre, s.apellido, s.dni, s.telefono, s.activo FROM gimnasio g INNER JOIN plan p ON g.idGimnasio=p.idGimnasio INNER JOIN socio_plan sp ON p.idPlan=sp.idPlan INNER JOIN socio s ON sp.idSocio=s.idSocio where g.idGimnasio=?;", [idGimnasio], callback);
     }
 
     createSocio = (socio, callback) => {
@@ -27,6 +27,10 @@ class SocioModel{
 
     deleteSocio = (id, callback) => {
         db.query('DELETE FROM socio WHERE idSocio = ?', [id], callback);
+    }
+
+    validarIngresos = (dni, callback) => {
+        db.query('SELECT * FROM socio s INNER JOIN socio_plan sp ON s.idSocio = sp.idSocio INNER JOIN plan p ON p.idPlan = sp.idPlan INNER JOIN gimnasio g ON g.idGimnasio = p.idGimnasio WHERE s.dni = ?;', [dni], callback)
     }
 }
 

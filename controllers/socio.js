@@ -15,7 +15,7 @@ class SocioController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-        
+
     }
 
     getSocioById = (req, res) => {
@@ -31,7 +31,7 @@ class SocioController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-        
+
     }
 
     getSocioByDni = (req, res) => {
@@ -47,7 +47,7 @@ class SocioController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-        
+
     }
 
     getSociosByGimnasio = (req, res) => {
@@ -63,12 +63,12 @@ class SocioController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-       
+
     }
 
     createSocio = (req, res) => {
         const socio = req.body;
-        socio.activo=socio.estado;
+        socio.activo = socio.estado;
         try {
             const socioValido = socioSchema.safeParse(socio);
             if (socioValido.success) {
@@ -85,9 +85,9 @@ class SocioController {
             }
         } catch (error) {
             console.log(error)
-            res.status(500).json({ error: error.message });            
+            res.status(500).json({ error: error.message });
         }
-        
+
     }
 
     updateSocio = (req, res) => {
@@ -107,9 +107,9 @@ class SocioController {
                 throw new Error(socioValido.error.errors[0].message);
             }
         } catch (error) {
-            res.status(500).json({ error: error.message });            
+            res.status(500).json({ error: error.message });
         }
-        
+
     }
 
     deleteSocio = (req, res) => {
@@ -123,9 +123,25 @@ class SocioController {
                 }
             })
         } catch (error) {
-            res.status(500).json({ error: error.message });            
+            res.status(500).json({ error: error.message });
         }
-       
+
+    }
+
+    validarIngreso = (req, res) => {
+        const dni = req.params.dni;
+        try {
+            socioModel.validarIngreso(dni, (err, data) => {
+                if (err) {
+                    console.log('ss')
+                    throw new Error("Error al validar el ingreso")
+                } else {
+                    res.status(200).json("Ingreso validado correctamente")
+                }
+            })
+        } catch (error) {
+            res.status(500).json({ error: error.message })
+        }
     }
 }
 
