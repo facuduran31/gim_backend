@@ -15,7 +15,7 @@ class inscripcionController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-        
+
     }
 
     getInscripcionById = (req, res) => {
@@ -30,18 +30,18 @@ class inscripcionController {
             });
         } catch (error) {
             res.status(500).json({ error: error.message });
-            
+
         }
-        
+
     }
 
 
-    getInscripcionesByIdGimnasio = (req, res)=>{
-        const idGimnasio=req.params.idGimnasio;
-        try{
-            inscripcionModel.getInscripcionesByIdGimnasio(idGimnasio,(err, data)=>{
-                if(err){
-                     throw new Error('Error al obtener las inscripciones');
+    getInscripcionesByIdGimnasio = (req, res) => {
+        const idGimnasio = req.params.idGimnasio;
+        try {
+            inscripcionModel.getInscripcionesByIdGimnasio(idGimnasio, (err, data) => {
+                if (err) {
+                    throw new Error('Error al obtener las inscripciones');
                 }
                 else {
                     res.status(200).json(data);
@@ -50,7 +50,7 @@ class inscripcionController {
         }
         catch (error) {
             res.status(500).json({ error: error.message });
-            
+
         }
     }
 
@@ -74,9 +74,9 @@ class inscripcionController {
             }
         } catch (error) {
             console.log(error)
-                res.status(500).json({ error: error.message });
+            res.status(500).json({ error: error.message });
         }
-        
+
     }
 
 
@@ -101,9 +101,9 @@ class inscripcionController {
             }
         } catch (error) {
             res.status(500).json({ error: error.message });
-            
+
         }
-       
+
     }
 
     deleteInscripcion = (req, res) => {
@@ -111,7 +111,7 @@ class inscripcionController {
         try {
             inscripcionModel.deleteInscripcion(idSocioPlan, (err, data) => {
                 if (err) {
-                        console.log(err)
+                    console.log(err)
 
                     throw new Error('Error al eliminar la inscripcion');
                 } else {
@@ -121,7 +121,7 @@ class inscripcionController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-      
+
     }
 }
 
