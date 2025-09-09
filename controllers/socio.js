@@ -22,6 +22,7 @@ class SocioController {
         const id = req.params.id;
         try {
             socioModel.getSocioById(id, (err, data) => {
+
                 if (err) {
                     throw new Error('Error al obtener el socio');
                 } else {
@@ -145,6 +146,7 @@ class SocioController {
                 }
             })
         } catch (error) {
+
             res.status(500).json({ error: error.message })
         }
     }

@@ -60,7 +60,9 @@ class inscripcionController {
             const inscripcionValida = inscripcionSchema.safeParse(inscripcion);
             if (inscripcionValida.success) {
                 inscripcionModel.createInscripcion(inscripcion, (err, data) => {
+
                     if (err) {
+
                         throw new Error('Error al crear la inscripcion');
                     } else {
                         res.status(201).json({ message: 'Inscripcion creada con éxito' });
