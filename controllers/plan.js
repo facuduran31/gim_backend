@@ -26,7 +26,7 @@ class planController {
                 if (err) {
                     throw new Error('Error al obtener el plan');
                 } else {
-                    res.status(200).json(data);
+                    res.status(200).json(data[0]);
                 }
             });
         } catch (error) {

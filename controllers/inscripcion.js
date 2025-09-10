@@ -15,7 +15,7 @@ class inscripcionController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-        
+
     }
 
     getInscripcionById = (req, res) => {
@@ -23,16 +23,35 @@ class inscripcionController {
         try {
             inscripcionModel.getInscripcionById(idSocioPlan, (err, data) => {
                 if (err) {
-                    throw new Error('Error al obtener la inscripcion');
+                    throw new Error('Error al obtener la inscripción');
                 } else {
-                    res.status(200).json(data);
+                    res.status(200).json(data[0]);
                 }
             });
         } catch (error) {
             res.status(500).json({ error: error.message });
-            
+
         }
-        
+
+    }
+
+
+    getInscripcionesByIdGimnasio = (req, res) => {
+        const idGimnasio = req.params.idGimnasio;
+        try {
+            inscripcionModel.getInscripcionesByIdGimnasio(idGimnasio, (err, data) => {
+                if (err) {
+                    throw new Error('Error al obtener las inscripciones');
+                }
+                else {
+                    res.status(200).json(data);
+                }
+            })
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+
+        }
     }
 
     createInscripcion = (req, res) => {
@@ -40,9 +59,10 @@ class inscripcionController {
         try {
             const inscripcionValida = inscripcionSchema.safeParse(inscripcion);
             if (inscripcionValida.success) {
-
                 inscripcionModel.createInscripcion(inscripcion, (err, data) => {
+
                     if (err) {
+
                         throw new Error('Error al crear la inscripcion');
                     } else {
                         res.status(201).json({ message: 'Inscripcion creada con éxito' });
@@ -53,9 +73,10 @@ class inscripcionController {
                 throw new Error(inscripcionValida.error.errors[0].message);
             }
         } catch (error) {
-                res.status(500).json({ error: error.message });
+            console.log(error)
+            res.status(500).json({ error: error.message });
         }
-        
+
     }
 
 
@@ -80,9 +101,9 @@ class inscripcionController {
             }
         } catch (error) {
             res.status(500).json({ error: error.message });
-            
+
         }
-       
+
     }
 
     deleteInscripcion = (req, res) => {
@@ -90,6 +111,8 @@ class inscripcionController {
         try {
             inscripcionModel.deleteInscripcion(idSocioPlan, (err, data) => {
                 if (err) {
+                    console.log(err)
+
                     throw new Error('Error al eliminar la inscripcion');
                 } else {
                     res.status(200).json({ message: 'Inscripcion eliminada con éxito' });
@@ -98,7 +121,7 @@ class inscripcionController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-      
+
     }
 }
 
