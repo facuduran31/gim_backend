@@ -11,6 +11,10 @@ class HistoricoPrecioModel {
     db.query('SELECT * FROM historico_precios where idHistoricoPrecio=?', [idHistoricoPrecio], callback)
   }
 
+  getLastHistoricoPrecio = (idPlan, callback) => {
+    db.query('SELECT * FROM historico_precio where idPlan=? AND fechaHasta=null;', [idPlan], callback)
+  }
+
   createHistoricoPrecio = (historicoPrecio, callback) => {
     db.query('INSERT INTO historico_precios (idPlan, precio, fechaDesde, fechaHasta) values (?, ?, ?, ?);', [historicoPrecio.idPlan, historicoPrecio.precio, historicoPrecio.fechaDesde, historicoPrecio.fechaHasta], callback)
   }

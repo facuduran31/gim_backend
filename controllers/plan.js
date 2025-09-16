@@ -1,4 +1,5 @@
 const planModel = require('../models/plan');
+const historicoPrecioModel = require('../models/historicoPrecio');
 const planSchema = require('../interfaces/plan');
 const e = require('cors');
 
@@ -16,7 +17,7 @@ class planController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-       
+
     }
 
     getPlanById = (req, res) => {
@@ -32,7 +33,7 @@ class planController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-        
+
     }
 
     getPlanesByGimnasio = (req, res) => {
@@ -48,7 +49,7 @@ class planController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-        
+
     }
 
 
@@ -61,7 +62,20 @@ class planController {
                     if (err) {
                         throw new Error('Error al crear el plan');
                     } else {
-                        res.status(201).json({ message: 'Plan creado con éxito' });
+                        planModel.getPlanByName(plan.nombre, (err, data) => {
+                            if (err) {
+                                throw new Error('Error al crear el plan');
+                            } else {
+                                const newHistoricoPrecio = { 'idPlan': data[0].id, 'precio': data[0].precio, 'fechaDesde': new Date().split('T')[0], 'fechaHasta': null }
+                                historicoPrecioModel.createHistoricoPrecio(newHistoricoPrecio, (err, data) => {
+                                    if (err) {
+                                        throw new Error('Error al actualizar el histórico precio');
+                                    } else {
+                                        res.status(201).json({ message: 'Plan creado con éxito' });
+                                    }
+                                })
+                            }
+                        })
                     }
                 });
             }
@@ -70,10 +84,10 @@ class planController {
             }
         } catch (error) {
             console.log(error);
-            
+
             res.status(500).json({ error: error.message });
         }
-        
+
 
     }
 
@@ -88,6 +102,20 @@ class planController {
                     if (err) {
                         throw new Error('Error al actualizar el plan');
                     } else {
+                        const newHistoricoPrecio = { 'idPlan': plan.id, 'precio': plan.precio, 'fechaDesde': new Date().split('T')[0], 'fechaHasta': null }
+                        historicoPrecioModel.getLastHistoricoPrecio(newHistoricoPrecio.idPlan, (err, data) => {
+                            if (err) {
+                                throw new Error('Error al actualizar el histórico precio');
+                            } else {
+                                if (newHistoricoPrecio != data[0].precio) {
+                                    historicoPrecioModel.createHistoricoPrecio(newHistoricoPrecio, (err, data) => {
+                                        if (err) {
+                                            throw new Error('Error al actualizar el histórico precio');
+                                        }
+                                    })
+                                }
+                            }
+                        })
                         res.status(200).json({ message: 'Plan actualizado con éxito' });
                     }
                 });
@@ -96,11 +124,10 @@ class planController {
                 throw new Error(planValido.error.errors[0].message);
             }
         } catch (error) {
-            res.status(500).json({ message: error.message });            
+            res.status(500).json({ message: error.message });
         }
-        
-
     }
+
 
     deletePlan = (req, res) => {
         const id = req.params.id;
@@ -113,9 +140,9 @@ class planController {
                 }
             });
         } catch (error) {
-            res.status(500).json({ error: error.message });            
+            res.status(500).json({ error: error.message });
         }
-       
+
     }
 }
 

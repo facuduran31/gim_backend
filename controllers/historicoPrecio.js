@@ -33,6 +33,22 @@ class HistoricoPrecioController {
 
   }
 
+  // getLastHistoricoPrecio = (req, res) => {
+  //   const idPlan = req.params.idPlan;
+  //   try {
+  //     historicoPrecioModel.getLastHistoricoPrecio(idPlan, (err, data) => {
+  //       if (err) {
+  //         throw new Error('Error al obtener el último histórico precio');
+  //       } else {
+  //         res.json(data[0]);
+  //       }
+  //     })
+  //   }
+  //   catch (error) {
+  //     res.status(500).json({ message: error.message });
+  //   }
+  // }
+
 
   createHistoricoPrecio = (req, res) => {
     const historicoPrecio = req.body;
