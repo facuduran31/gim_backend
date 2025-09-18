@@ -59,7 +59,7 @@ class planController {
             if (planValido.success) {
                 planModel.createPlan(plan, (err, data) => {
                     if (err) {
-                        throw new Error('Error al crear el plan');
+                        throw new Error('Error al crear el plan'+err);
                     } else {
                         res.status(201).json({ message: 'Plan creado con éxito' });
                     }
