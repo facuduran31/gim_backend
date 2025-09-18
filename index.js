@@ -10,6 +10,9 @@ const session = require('express-session');
 require('./middlewares/passport');
 const {generateToken} = require('./middlewares/token');
 const cookieParser = require('cookie-parser');
+const historicoPreciosRoutes = require('./routes/historico_precios');
+const metodoPagoRoutes = require('./routes/metodo_pago');
+const pagoRoutes = require('./routes/pago');
 
 //Variables de entorno
 require('dotenv').config();
@@ -82,7 +85,9 @@ app.use('/usuarios', usuarioRouter);
 app.use('/socios', socioRouter);
 app.use('/planes', planRouter);
 app.use('/inscripciones', inscripcionRouter);
-
+app.use('/api/historico-precios', historicoPreciosRoutes);
+app.use('/api/metodos-pago', metodoPagoRoutes);
+app.use('/api/pagos', pagoRoutes);
 
 
 //Levantar el servidor
