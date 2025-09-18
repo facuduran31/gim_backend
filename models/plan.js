@@ -14,7 +14,7 @@ class planModel{
     }
 
     createPlan = (plan, callback) => {
-        db.query('INSERT INTO plan (nombre, descripcion, duracion, diasPorSemana, idGimnasio) VALUES (?, ?, ?, ?, ?, ?)', [plan.nombre, plan.descripcion, plan.duracion, plan.diasPorSemana, plan.idGimnasio], callback);
+        db.query('INSERT INTO plan (nombre, descripcion, duracion, diasPorSemana, idGimnasio) VALUES (?, ?, ?, ?, ?)', [plan.nombre, plan.descripcion, plan.duracion, plan.diasPorSemana, plan.idGimnasio], callback);
     }
 
     updatePlan = (plan, callback) => {

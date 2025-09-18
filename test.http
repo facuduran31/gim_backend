@@ -1,15 +1,1 @@
-###
-
-GET http://localhost:3000/usuarios HTTP/1.1
-
-###
-
-POST http://localhost:3000/usuarios HTTP/1.1
-Content-Type: application/json
-
-{
-  "nombre": "asd",
-  "mail": "ad",
-    "apellido": "asd"
-
-}
+GET http://localhost:3000/historico-precios/plan/11 HTTP/1.1

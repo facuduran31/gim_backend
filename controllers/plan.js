@@ -1,121 +1,116 @@
 const planModel = require('../models/plan');
+const historicoPreciosModel = require('../models/historico_precios');
 const planSchema = require('../interfaces/plan');
-const e = require('cors');
 
 class planController {
-
     getAllPlanes = (req, res) => {
         try {
             planModel.getAllPlanes((err, data) => {
-                if (err) {
-                    throw new Error('Error al obtener los planes');
-                } else {
-                    res.status(200).json(data);
-                }
+                if (err) throw new Error('Error al obtener los planes');
+                res.status(200).json(data);
             });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-       
     }
 
     getPlanById = (req, res) => {
         const id = req.params.id;
         try {
             planModel.getPlanById(id, (err, data) => {
-                if (err) {
-                    throw new Error('Error al obtener el plan');
-                } else {
-                    res.status(200).json(data);
-                }
+                if (err) throw new Error('Error al obtener el plan');
+                res.status(200).json(data);
             });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-        
     }
 
     getPlanesByGimnasio = (req, res) => {
         const idGimnasio = req.params.idGimnasio;
         try {
             planModel.getPlanesByGimnasio(idGimnasio, (err, data) => {
-                if (err) {
-                    throw new Error('Error al obtener los planes');
-                } else {
-                    res.status(200).json(data);
-                }
+                if (err) throw new Error('Error al obtener los planes');
+                res.status(200).json(data);
             });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-        
     }
-
 
     createPlan = (req, res) => {
         const plan = req.body;
         try {
             const planValido = planSchema.safeParse(plan);
-            if (planValido.success) {
-                planModel.createPlan(plan, (err, data) => {
-                    if (err) {
-                        throw new Error('Error al crear el plan'+err);
-                    } else {
-                        res.status(201).json({ message: 'Plan creado con éxito' });
+            if (!planValido.success) throw new Error(planValido.error.errors[0].message);
+
+            planModel.createPlan(plan, (err, data) => {
+                if (err) throw new Error('Error al crear el plan: ' + err);
+
+                // 🔹 Insertar histórico de precios
+                const idPlan = data.insertId; // id generado por el insert
+                historicoPreciosModel.createHistoricoPrecio(
+                    { idPlan, precio: plan.precio },
+                    (err2) => {
+                        if (err2) console.error('Error al guardar histórico de precios:', err2);
                     }
-                });
-            }
-            else {
-                throw new Error(planValido.error.errors[0].message);
-            }
+                );
+
+                res.status(201).json({ message: 'Plan creado con éxito' });
+            });
         } catch (error) {
-            console.log(error);
-            
+            console.error(error);
             res.status(500).json({ error: error.message });
         }
-        
-
     }
 
     updatePlan = (req, res) => {
         const plan = req.body;
+        plan.id = parseInt(req.params.id);
 
         try {
-            plan.id = parseInt(req.params.id);
             const planValido = planSchema.safeParse(plan);
-            if (planValido.success) {
-                planModel.updatePlan(plan, (err, data) => {
-                    if (err) {
-                        throw new Error('Error al actualizar el plan');
-                    } else {
-                        res.status(200).json({ message: 'Plan actualizado con éxito' });
-                    }
-                });
-            }
-            else {
-                throw new Error(planValido.error.errors[0].message);
-            }
-        } catch (error) {
-            res.status(500).json({ message: error.message });            
-        }
-        
+            if (!planValido.success) throw new Error(planValido.error.errors[0].message);
 
+            // 🔹 Primero obtenemos el plan actual para ver si cambió el precio
+            planModel.getPlanById(plan.id, (err, oldData) => {
+                if (err) throw new Error('Error al obtener el plan actual');
+                if (!oldData || oldData.length === 0) throw new Error('Plan no encontrado');
+
+                const precioAnterior = oldData[0].precio;
+
+                // Actualizamos el plan
+                planModel.updatePlan(plan, (err2) => {
+                    if (err2) throw new Error('Error al actualizar el plan');
+
+                    // Si cambió el precio, insertamos en el histórico
+                    if (plan.precio && plan.precio != precioAnterior) {
+                        historicoPreciosModel.createHistoricoPrecio(
+                            { idPlan: plan.id, precio: plan.precio },
+                            (err3) => {
+                                if (err3) console.error('Error al guardar histórico de precios:', err3);
+                            }
+                        );
+                    }
+
+                    res.status(200).json({ message: 'Plan actualizado con éxito' });
+                });
+            });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
     }
 
     deletePlan = (req, res) => {
         const id = req.params.id;
         try {
-            planModel.deletePlan(id, (err, data) => {
-                if (err) {
-                    throw new Error('Error al eliminar el plan');
-                } else {
-                    res.status(200).json({ message: 'Plan eliminado con éxito' });
-                }
+            planModel.deletePlan(id, (err) => {
+                if (err) throw new Error('Error al eliminar el plan');
+                res.status(200).json({ message: 'Plan eliminado con éxito' });
             });
         } catch (error) {
-            res.status(500).json({ error: error.message });            
+            res.status(500).json({ error: error.message });
         }
-       
     }
 }
 

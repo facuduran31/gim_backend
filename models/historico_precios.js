@@ -1,33 +1,35 @@
 const db = require('./db.js');
 
-class HistoricoPreciosModel {
-    getAll = (callback) => {
-        db.query('SELECT * FROM historico_precios', callback);
-    }
-
-    getById = (id, callback) => {
-        db.query('SELECT * FROM historico_precios WHERE idHistoricoPrecios = ?', [id], callback);
-    }
-
-    create = (registro, callback) => {
+class historicoPreciosModel {
+    // Crear un nuevo registro en el histórico
+    createHistoricoPrecio = (registro, callback) => {
         db.query(
-            'INSERT INTO historico_precios (idHistoricoPrecios, idPlan, precio, fechaDesde, fechaHasta) VALUES (?, ?, ?, ?, ?)',
-            [registro.idHistoricoPrecios, registro.idPlan, registro.precio, registro.fechaDesde, registro.fechaHasta],
+            `INSERT INTO historico_precios (idPlan, precio, fechaDesde) 
+             VALUES (?, ?, CURDATE())`,
+            [registro.idPlan, registro.precio],
             callback
         );
     }
 
-    update = (registro, callback) => {
+    // Cerrar el precio actual (cuando cambia el precio de un plan)
+    cerrarHistoricoPrecio = (idPlan, callback) => {
         db.query(
-            'UPDATE historico_precios SET idPlan = ?, precio = ?, fechaDesde = ?, fechaHasta = ? WHERE idHistoricoPrecios = ?',
-            [registro.idPlan, registro.precio, registro.fechaDesde, registro.fechaHasta, registro.id],
+            `UPDATE historico_precios 
+             SET fechaHasta = CURDATE() 
+             WHERE idPlan = ? AND fechaHasta IS NULL`,
+            [idPlan],
             callback
         );
     }
 
-    delete = (id, callback) => {
-        db.query('DELETE FROM historico_precios WHERE idHistoricoPrecios = ?', [id], callback);
+    // Obtener el histórico completo de un plan
+    getHistoricoByPlan = (idPlan, callback) => {
+        db.query(
+            `SELECT * FROM historico_precios WHERE idPlan = ? ORDER BY fechaDesde DESC`,
+            [idPlan],
+            callback
+        );
     }
 }
 
-module.exports = new HistoricoPreciosModel();
+module.exports = new historicoPreciosModel();

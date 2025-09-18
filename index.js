@@ -85,9 +85,9 @@ app.use('/usuarios', usuarioRouter);
 app.use('/socios', socioRouter);
 app.use('/planes', planRouter);
 app.use('/inscripciones', inscripcionRouter);
-app.use('/api/historico-precios', historicoPreciosRoutes);
-app.use('/api/metodos-pago', metodoPagoRoutes);
-app.use('/api/pagos', pagoRoutes);
+app.use('/historico-precios', historicoPreciosRoutes);
+app.use('/metodos-pago', metodoPagoRoutes);
+app.use('/pagos', pagoRoutes);
 
 
 //Levantar el servidor
