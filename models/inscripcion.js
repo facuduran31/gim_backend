@@ -9,9 +9,13 @@ class inscripcionModel {
         db.query('SELECT * FROM socio_plan WHERE idSocioPlan = ?;', [idSocioPlan], callback);
     }
 
-    
-    getInscripcionesByIdGimnasio(idGimnasio, callback){
-        db.query('SELECT * FROM gimnasio g INNER JOIN plan p on g.idGimnasio=p.idGimnasio INNER JOIN socio_plan sp on p.idPlan=sp.idPlan WHERE g.idGimnasio=?;',[idGimnasio],callback);
+
+    getInscripcionesByIdGimnasio(idGimnasio, callback) {
+        db.query('SELECT * FROM gimnasio g INNER JOIN plan p on g.idGimnasio=p.idGimnasio INNER JOIN socio_plan sp on p.idPlan=sp.idPlan WHERE g.idGimnasio=?;', [idGimnasio], callback);
+    }
+
+    getInscripcionActual(idSocio, callback) {
+        db.query('SELECT * FROM socio_plan where idSocio = ? order by fechaFin desc;', [idSocio], callback)
     }
 
 
