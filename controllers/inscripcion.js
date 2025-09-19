@@ -59,12 +59,11 @@ class inscripcionController {
         try {
             const inscripcionValida = inscripcionSchema.safeParse(inscripcion);
             if (inscripcionValida.success) {
-                inscripcion.fechaInicio=inscripcion.fechaInicio.split('T')[0];
-                inscripcion.fechaFin=inscripcion.fechaFin.split('T')[0];
+                inscripcion.fechaInicio = inscripcion.fechaInicio.split('T')[0];
+                inscripcion.fechaFin = inscripcion.fechaFin.split('T')[0];
                 inscripcionModel.createInscripcion(inscripcion, (err, data) => {
 
                     if (err) {
-                        console.log(err)
                         throw new Error('Error al crear la inscripcion');
                     } else {
                         res.status(201).json({ message: 'Inscripcion creada con éxito' });
@@ -90,8 +89,8 @@ class inscripcionController {
             const inscripcionValida = inscripcionSchema.safeParse(inscripcion);
 
             if (inscripcionValida.success) {
-                inscripcion.fechaInicio=inscripcion.fechaInicio.split('T')[0];
-                inscripcion.fechaFin=inscripcion.fechaFin.split('T')[0];
+                inscripcion.fechaInicio = inscripcion.fechaInicio.split('T')[0];
+                inscripcion.fechaFin = inscripcion.fechaFin.split('T')[0];
                 inscripcionModel.updateInscripcion(inscripcion, (err, data) => {
                     if (err) {
                         throw new Error('Error al actualizar la inscripcion');

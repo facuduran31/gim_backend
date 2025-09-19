@@ -77,7 +77,7 @@ class SocioController {
                     if (err) {
                         throw new Error('Error al crear el socio');
                     } else {
-                        res.status(201).json({ message: 'Socio creado correctamente' });
+                        res.status(201).json({ message: 'Socio creado correctamente', idSocio: data.insertId });
                     }
                 })
 
@@ -85,7 +85,6 @@ class SocioController {
                 throw new Error(socioValido.error.errors[0].message);
             }
         } catch (error) {
-            console.log(error)
             res.status(500).json({ error: error.message });
         }
 
