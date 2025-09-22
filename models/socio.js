@@ -22,8 +22,9 @@ class SocioModel {
     }
 
     updateSocio = (socio, callback) => {
-        db.query('UPDATE socio SET nombre = ?, apellido = ?, dni = ?, telefono = ?, activo = ?, idGimnasio = ? WHERE idSocio = ?', [socio.nombre, socio.apellido, socio.dni, socio.telefono, socio.activo, socio.id, socio.idGimnasio], callback);
+        db.query('UPDATE socio SET nombre = ?, apellido = ?, dni = ?, telefono = ?, activo = ?, idGimnasio = ? WHERE idSocio = ?', [socio.nombre, socio.apellido, socio.dni, socio.telefono, socio.activo, socio.idSocio, socio.idGimnasio], callback);
     }
+
 
     deleteSocio = (id, callback) => {
         db.query('DELETE FROM socio WHERE idSocio = ?', [id], callback);

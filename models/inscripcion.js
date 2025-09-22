@@ -31,6 +31,10 @@ class inscripcionModel {
         db.query('DELETE FROM socio_plan WHERE idSocioPlan = ?;', [idSocioPlan], callback);
     }
 
+    planActivo = (idSocio, callback) => {
+        db.query('SELECT * FROM socio_plan WHERE idSocio=? and fechaFin>CURDATE();', [idSocio], callback)
+    }
+
 }
 
 module.exports = new inscripcionModel();

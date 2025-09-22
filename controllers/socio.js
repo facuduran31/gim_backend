@@ -90,22 +90,27 @@ class SocioController {
 
     }
 
-    updateSocio = (req, res) => {
+
+    updateSocio = async (req, res) => {
         const socio = req.body;
         try {
             socio.id = parseInt(req.params.id);
+            socio.activo = socio.estado ? true : false;
             const socioValido = socioSchema.safeParse(socio);
             if (socioValido.success) {
+                console.log(socio)
                 socioModel.updateSocio(socio, (err, data) => {
+                    console.log(data)
                     if (err) {
                         throw new Error('Error al actualizar el socio');
                     } else {
-                        res.status(200).json({ message: 'Socio actualizado correctamente' });
+                        res.status(200).json({ message: 'Socio actualizado correctamente' })
                     }
                 })
             } else {
                 throw new Error(socioValido.error.errors[0].message);
             }
+
         } catch (error) {
             res.status(500).json({ error: error.message });
         }

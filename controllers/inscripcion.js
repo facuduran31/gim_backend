@@ -74,31 +74,53 @@ class inscripcionController {
     }
 
 
-    createInscripcion = (req, res) => {
-        const inscripcion = req.body;
-        try {
-            const inscripcionValida = inscripcionSchema.safeParse(inscripcion);
-            if (inscripcionValida.success) {
-                inscripcion.fechaInicio = inscripcion.fechaInicio.split('T')[0];
-                inscripcion.fechaFin = inscripcion.fechaFin.split('T')[0];
-                inscripcionModel.createInscripcion(inscripcion, (err, data) => {
+    planActivo = (idSocio) => {
+        return new Promise((resolve, reject) => {
+            inscripcionModel.planActivo(idSocio, (err, data) => {
+                if (err) {
+                    reject(new Error("Error al verificar plan en actividad"));
+                } else {
+                    resolve(data.length > 0);
+                }
+            });
+        });
+    }
 
-                    if (err) {
-                        throw new Error('Error al crear la inscripcion');
-                    } else {
-                        res.status(201).json({ message: 'Inscripcion creada con éxito' });
-                    }
-                });
+    createInscripcion = async (req, res) => {
+        const inscripcion = req.body;
+        const planActivo = await this.planActivo(inscripcion.idSocio);
+        if (!planActivo) {
+            try {
+                const inscripcionValida = inscripcionSchema.safeParse(inscripcion);
+                if (inscripcionValida.success) {
+                    inscripcion.fechaInicio = inscripcion.fechaInicio.split('T')[0];
+                    inscripcion.fechaFin = inscripcion.fechaFin.split('T')[0];
+                    inscripcionModel.createInscripcion(inscripcion, (err, data) => {
+
+                        if (err) {
+                            throw new Error('Error al crear la inscripcion');
+                        } else {
+                            console.log('a')
+                            res.status(201).json({ message: 'Inscripcion creada con éxito' });
+                        }
+                    });
+                }
+                else {
+                    throw new Error(inscripcionValida.error.errors[0].message);
+                }
+            } catch (error) {
+                res.status(500).json({ error: error.message });
             }
-            else {
-                throw new Error(inscripcionValida.error.errors[0].message);
-            }
-        } catch (error) {
-            console.log(error)
-            res.status(500).json({ error: error.message });
+        }
+        else {
+            res.status(200).json({ message: 'Inscripción ya existente' });
         }
 
+
     }
+
+
+
 
 
     updateInscripcion = (req, res) => {
