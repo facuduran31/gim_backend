@@ -1,11 +1,11 @@
-const pagoModel = require('../models/pago');
-const pagoSchema = require('../interfaces/pago');
+const metodoPagoModel = require('../models/metodo_pago');
+const metodoPagoSchema = require('../interfaces/metodo_pago');
 
-class PagoController {
+class MetodoPagoController {
     getAll = (req, res) => {
         try {
-            pagoModel.getAll((err, data) => {
-                if (err) throw new Error('Error al obtener los pagos');
+            metodoPagoModel.getAll((err, data) => {
+                if (err) throw new Error('Error al obtener los métodos de pago');
                 res.json(data);
             });
         } catch (error) {
@@ -16,8 +16,8 @@ class PagoController {
     getById = (req, res) => {
         const id = req.params.id;
         try {
-            pagoModel.getById(id, (err, data) => {
-                if (err) throw new Error('Error al obtener el pago');
+            metodoPagoModel.getById(id, (err, data) => {
+                if (err) throw new Error('Error al obtener el método de pago');
                 res.json(data[0]);
             });
         } catch (error) {
@@ -28,11 +28,11 @@ class PagoController {
     create = (req, res) => {
         const nuevo = req.body;
         try {
-            const valido = pagoSchema.safeParse(nuevo);
+            const valido = metodoPagoSchema.safeParse(nuevo);
             if (valido.success) {
-                pagoModel.create(nuevo, (err, data) => {
-                    if (err) throw new Error('Error al crear el pago');
-                    res.json({ message: 'Pago creado correctamente' });
+                metodoPagoModel.create(nuevo, (err, data) => {
+                    if (err) throw new Error('Error al crear el método de pago');
+                    res.json({ message: 'Método de pago creado correctamente' });
                 });
             } else {
                 throw new Error(valido.error.errors[0].message);
@@ -47,17 +47,17 @@ class PagoController {
         datosNuevos.id = parseInt(req.params.id);
 
         try {
-            pagoModel.getById(datosNuevos.id, (err, registro) => {
-                if (err) throw new Error('Error al actualizar el pago');
+            metodoPagoModel.getById(datosNuevos.id, (err, registro) => {
+                if (err) throw new Error('Error al actualizar el método de pago');
                 if (!registro) throw new Error('Registro no encontrado');
 
                 const actualizado = { ...registro[0], ...datosNuevos };
-                const valido = pagoSchema.safeParse(actualizado);
+                const valido = metodoPagoSchema.safeParse(actualizado);
 
                 if (valido.success) {
-                    pagoModel.update(actualizado, (err, data) => {
-                        if (err) throw new Error('Error al actualizar el pago');
-                        res.json({ message: 'Pago actualizado correctamente' });
+                    metodoPagoModel.update(actualizado, (err, data) => {
+                        if (err) throw new Error('Error al actualizar el método de pago');
+                        res.json({ message: 'Método de pago actualizado correctamente' });
                     });
                 } else {
                     throw new Error(valido.error.errors[0].message);
@@ -71,9 +71,9 @@ class PagoController {
     delete = (req, res) => {
         const id = req.params.id;
         try {
-            pagoModel.delete(id, (err, data) => {
-                if (err) throw new Error('Error al eliminar el pago');
-                res.json({ message: 'Pago eliminado correctamente' });
+            metodoPagoModel.delete(id, (err, data) => {
+                if (err) throw new Error('Error al eliminar el método de pago');
+                res.json({ message: 'Método de pago eliminado correctamente' });
             });
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -81,5 +81,4 @@ class PagoController {
     }
 }
 
-module.exports = new PagoController();
-
+module.exports = new MetodoPagoController();

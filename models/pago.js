@@ -1,28 +1,34 @@
 const db = require('./db.js');
 
-
 class PagoModel {
+    getAll = (callback) => {
+        db.query('SELECT * FROM pago', callback);
+    }
 
-  getAllPagos = (callback) => {
-    db.query('SELECT * FROM pago;', callback)
-  }
+    getById = (id, callback) => {
+        db.query('SELECT * FROM pago WHERE idPago = ?', [id], callback);
+    }
 
-  getPagoById = (idPago, callback) => {
-    db.query('SELECT * FROM pago where idPago=?', [idPago], callback)
-  }
+    create = (pago, callback) => {
+        db.query(
+            'INSERT INTO pago (idPago, idSocioPlan, idMetodoPago, monto, fechaPago) VALUES (?, ?, ?, ?, ?)',
+            [pago.idPago, pago.idSocioPlan, pago.idMetodoPago, pago.monto, pago.fechaPago],
+            callback
+        );
+    }
 
-  createPago = (pago, callback) => {
-    db.query('INSERT INTO pago (idSocioPlan, idMetodoPago, monto, fechaPago) values (?, ?, ?, ?);', [pago.idSocioPlan, pago.idMetodoPago, pago.monto, pago.fechaPago], callback)
-  }
+    update = (pago, callback) => {
+        db.query(
+            'UPDATE pago SET idSocioPlan = ?, idMetodoPago = ?, monto = ?, fechaPago = ? WHERE idPago = ?',
+            [pago.idSocioPlan, pago.idMetodoPago, pago.monto, pago.fechaPago, pago.id],
+            callback
+        );
+    }
 
-  updatePago = (pago, callback) => {
-    db.query('UPDATE pago SET idSocioPlan=?, idMetodoPago=?, monto=?, fechaPago=? WHERE idPago=?;', [pago.idSocioPlan, pago.idMetodoPago, pago.monto, pago.fechaPago, pago.id], callback)
-  }
-
-  deletePago = (idPago, callback) => {
-    db.query('DELETE FROM pago WHERE idPago=?', [idPago], callback)
-  }
+    delete = (id, callback) => {
+        db.query('DELETE FROM pago WHERE idPago = ?', [id], callback);
+    }
 }
 
-
 module.exports = new PagoModel();
+
