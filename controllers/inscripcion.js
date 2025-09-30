@@ -89,7 +89,6 @@ class inscripcionController {
     createInscripcion = async (req, res) => {
         const inscripcion = req.body;
         const planActivo = await this.planActivo(inscripcion.idSocio);
-        console.log(planActivo)
         if (!planActivo) {
             try {
                 const inscripcionValida = inscripcionSchema.safeParse(inscripcion);
