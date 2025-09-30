@@ -31,3 +31,4 @@ class PagoModel {
 }
 
 module.exports = new PagoModel();
+

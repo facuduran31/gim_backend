@@ -2,6 +2,7 @@ const router = require('express').Router();
 const pagoController = require('../controllers/pago');
 const { validateToken } = require('../middlewares/token');
 
+
 // Rutas
 router.get('/', validateToken, pagoController.getAll);
 router.get('/:id', validateToken, pagoController.getById);

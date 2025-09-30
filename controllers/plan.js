@@ -1,5 +1,7 @@
 const planModel = require('../models/plan');
+
 const historicoPreciosModel = require('../models/historico_precios');
+
 const planSchema = require('../interfaces/plan');
 
 class planController {
@@ -12,6 +14,7 @@ class planController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
+
     }
 
     getPlanById = (req, res) => {
@@ -24,6 +27,7 @@ class planController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
+
     }
 
     getPlanesByGimnasio = (req, res) => {
@@ -36,12 +40,14 @@ class planController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
+
     }
 
     createPlan = (req, res) => {
         const plan = req.body;
         try {
             const planValido = planSchema.safeParse(plan);
+
             if (!planValido.success) throw new Error(planValido.error.errors[0].message);
 
             planModel.createPlan(plan, (err, data) => {
@@ -59,6 +65,7 @@ class planController {
                 res.status(201).json({ message: 'Plan creado con éxito' });
             });
         } catch (error) {
+
             console.error(error);
             res.status(500).json({ error: error.message });
         }
@@ -67,6 +74,7 @@ class planController {
     updatePlan = (req, res) => {
         const plan = req.body;
         plan.id = parseInt(req.params.id);
+
 
         try {
             const planValido = planSchema.safeParse(plan);
@@ -91,6 +99,7 @@ class planController {
                                 if (err3) console.error('Error al guardar histórico de precios:', err3);
                             }
                         );
+
                     }
 
                     res.status(200).json({ message: 'Plan actualizado con éxito' });
@@ -101,9 +110,11 @@ class planController {
         }
     }
 
+
     deletePlan = (req, res) => {
         const id = req.params.id;
         try {
+
             planModel.deletePlan(id, (err) => {
                 if (err) throw new Error('Error al eliminar el plan');
                 res.status(200).json({ message: 'Plan eliminado con éxito' });
@@ -111,6 +122,7 @@ class planController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
+
     }
 }
 

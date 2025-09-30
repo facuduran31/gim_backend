@@ -1,6 +1,6 @@
 const db = require('./db.js');
 
-class planModel{
+class planModel {
     getAllPlanes = (callback) => {
         db.query('SELECT * FROM plan', callback);
     }
@@ -8,9 +8,13 @@ class planModel{
     getPlanById = (id, callback) => {
         db.query('SELECT * FROM plan WHERE idPlan = ?', [id], callback);
     }
-    
+
     getPlanesByGimnasio = (idGimnasio, callback) => {
         db.query('SELECT * FROM plan WHERE idGimnasio = ?', [idGimnasio], callback);
+    }
+
+    getPlanByName = (nombre, callback) => {
+        db.query('SELECT * FROM plan WHERE nombre=?', [nombre], callback)
     }
 
     createPlan = (plan, callback) => {
