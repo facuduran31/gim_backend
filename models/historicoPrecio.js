@@ -12,14 +12,14 @@ class HistoricoPrecioModel {
   }
 
   getLastHistoricoPrecio = (idPlan, callback) => {
-    db.query('SELECT * FROM historico_precio where idPlan=? AND fechaHasta=null;', [idPlan], callback)
+    db.query('SELECT * FROM historico_precios where idPlan=? AND fechaHasta is null;', [idPlan], callback)
   }
 
   createHistoricoPrecio = (historicoPrecio, callback) => {
     db.query('INSERT INTO historico_precios (idPlan, precio, fechaDesde, fechaHasta) values (?, ?, ?, ?);', [historicoPrecio.idPlan, historicoPrecio.precio, historicoPrecio.fechaDesde, historicoPrecio.fechaHasta], callback)
   }
 
-  updateHistoricoPrecio = (pago, callback) => {
+  updateHistoricoPrecio = (historicoPrecio, callback) => {
     db.query('UPDATE historico_precios SET idPlan=?, precio=?, fechaDesde=?, fechaHasta=? WHERE idHistoricoPrecio=?;', [historicoPrecio.idPlan, historicoPrecio.precio, historicoPrecio.fechaDesde, historicoPrecio.fechaHasta, historicoPrecio.id], callback)
   }
 

@@ -66,7 +66,7 @@ class planController {
                             if (err) {
                                 throw new Error('Error al crear el plan');
                             } else {
-                                const newHistoricoPrecio = { 'idPlan': data[0].id, 'precio': data[0].precio, 'fechaDesde': new Date().split('T')[0], 'fechaHasta': null }
+                                const newHistoricoPrecio = { 'idPlan': data[0].idPlan, 'precio': plan.precio, 'fechaDesde': new Date().toISOString().split('T')[0], 'fechaHasta': null }
                                 historicoPrecioModel.createHistoricoPrecio(newHistoricoPrecio, (err, data) => {
                                     if (err) {
                                         throw new Error('Error al actualizar el histórico precio');
@@ -83,8 +83,6 @@ class planController {
                 throw new Error(planValido.error.errors[0].message);
             }
         } catch (error) {
-            console.log(error);
-
             res.status(500).json({ error: error.message });
         }
 
@@ -94,6 +92,7 @@ class planController {
     updatePlan = (req, res) => {
         const plan = req.body;
 
+
         try {
             plan.id = parseInt(req.params.id);
             const planValido = planSchema.safeParse(plan);
@@ -102,9 +101,10 @@ class planController {
                     if (err) {
                         throw new Error('Error al actualizar el plan');
                     } else {
-                        const newHistoricoPrecio = { 'idPlan': plan.id, 'precio': plan.precio, 'fechaDesde': new Date().split('T')[0], 'fechaHasta': null }
+                        const newHistoricoPrecio = { 'idPlan': plan.id, 'precio': plan.precio, 'fechaDesde': new Date().toISOString().split('T')[0], 'fechaHasta': null }
                         historicoPrecioModel.getLastHistoricoPrecio(newHistoricoPrecio.idPlan, (err, data) => {
                             if (err) {
+                                console.log(err)
                                 throw new Error('Error al actualizar el histórico precio');
                             } else {
                                 if (newHistoricoPrecio != data[0].precio) {
@@ -134,6 +134,7 @@ class planController {
         try {
             planModel.deletePlan(id, (err, data) => {
                 if (err) {
+                    console.log(err)
                     throw new Error('Error al eliminar el plan');
                 } else {
                     res.status(200).json({ message: 'Plan eliminado con éxito' });
