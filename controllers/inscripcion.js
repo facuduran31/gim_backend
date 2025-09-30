@@ -89,6 +89,7 @@ class inscripcionController {
     createInscripcion = async (req, res) => {
         const inscripcion = req.body;
         const planActivo = await this.planActivo(inscripcion.idSocio);
+        console.log(planActivo)
         if (!planActivo) {
             try {
                 const inscripcionValida = inscripcionSchema.safeParse(inscripcion);
@@ -100,7 +101,6 @@ class inscripcionController {
                         if (err) {
                             throw new Error('Error al crear la inscripcion');
                         } else {
-                            console.log('a')
                             res.status(201).json({ message: 'Inscripcion creada con éxito' });
                         }
                     });

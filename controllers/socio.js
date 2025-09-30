@@ -98,9 +98,7 @@ class SocioController {
             socio.activo = socio.estado ? true : false;
             const socioValido = socioSchema.safeParse(socio);
             if (socioValido.success) {
-                console.log(socio)
                 socioModel.updateSocio(socio, (err, data) => {
-                    console.log(data)
                     if (err) {
                         throw new Error('Error al actualizar el socio');
                     } else {
