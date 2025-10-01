@@ -30,6 +30,15 @@ class historicoPreciosModel {
             callback
         );
     }
+
+    // Obtener el ultimo histórico de un plan
+    getUltimoHistoricoByPlan = (idPlan, callback) => {
+        db.query(
+            `SELECT * FROM historico_precios WHERE idPlan = ? ORDER BY fechaDesde DESC LIMIT 1`,
+            [idPlan],
+            callback
+        );
+    }
 }
 
 module.exports = new historicoPreciosModel();

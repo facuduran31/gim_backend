@@ -6,8 +6,6 @@ const socioRouter = require('./routes/socio');
 const planRouter = require('./routes/plan');
 const inscripcionRouter = require('./routes/inscripcion');
 const pagoRouter = require('./routes/pago');
-const metodoPagoRouter = require('./routes/metodoPago');
-const historicoPrecioRouter = require('./routes/historicoPrecio');
 const passport = require('passport');
 const session = require('express-session');
 require('./middlewares/passport');

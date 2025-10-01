@@ -71,7 +71,8 @@ class planController {
         }
     }
 
-    updatePlan = (req, res) => {
+    
+     updatePlan = (req, res) => {
         const plan = req.body;
         plan.id = parseInt(req.params.id);
 
@@ -81,11 +82,12 @@ class planController {
             if (!planValido.success) throw new Error(planValido.error.errors[0].message);
 
             // 🔹 Primero obtenemos el plan actual para ver si cambió el precio
-            planModel.getPlanById(plan.id, (err, oldData) => {
+            historicoPreciosModel.getUltimoHistoricoByPlan(plan.id, (err, oldData) => {
                 if (err) throw new Error('Error al obtener el plan actual');
-                if (!oldData || oldData.length === 0) throw new Error('Plan no encontrado');
-
-                const precioAnterior = oldData[0].precio;
+                let precioAnterior=0;
+                if (oldData.length!=0){ 
+                    precioAnterior= oldData[0].precio;
+                }
 
                 // Actualizamos el plan
                 planModel.updatePlan(plan, (err2) => {
@@ -93,12 +95,18 @@ class planController {
 
                     // Si cambió el precio, insertamos en el histórico
                     if (plan.precio && plan.precio != precioAnterior) {
-                        historicoPreciosModel.createHistoricoPrecio(
-                            { idPlan: plan.id, precio: plan.precio },
-                            (err3) => {
-                                if (err3) console.error('Error al guardar histórico de precios:', err3);
-                            }
-                        );
+                        historicoPreciosModel.cerrarHistoricoPrecio(plan.id, (err3, data)=>{
+                                if (err3) console.error('Error al cerrar histórico de precios:', err3);
+
+                                historicoPreciosModel.createHistoricoPrecio(
+                                    { idPlan: plan.id, precio: plan.precio },
+                                    (err4) => {
+                                        if (err4) console.error('Error al guardar histórico de precios:', err4);
+                                    }
+                                );
+
+                        })
+                        
 
                     }
 
