@@ -56,13 +56,8 @@ class ingresoController {
                 res.status(500).json({ error: error.message });
             }
         }
-    }
 
-
-
-
-
-    updateingreso = (req, res) => {
+    updateIngreso = (req, res) => {
         const ingreso = req.body;
         ingreso.idSocioPlan = req.params.idSocioPlan;
 
@@ -104,7 +99,7 @@ class ingresoController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-
     }
+}
 
 module.exports = new ingresoController();
