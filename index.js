@@ -14,6 +14,7 @@ const cookieParser = require('cookie-parser');
 const historicoPreciosRoutes = require('./routes/historico_precios');
 const metodoPagoRoutes = require('./routes/metodo_pago');
 const pagoRoutes = require('./routes/pago');
+const ingresosRoutes = require('./routes/ingreso');
 
 //Variables de entorno
 require('dotenv').config();
@@ -89,6 +90,7 @@ app.use('/inscripciones', inscripcionRouter);
 app.use('/historico-precios', historicoPreciosRoutes);
 app.use('/metodos-pago', metodoPagoRoutes);
 app.use('/pagos', pagoRoutes);
+app.use("/ingresos", ingresosRoutes)
 
 
 
