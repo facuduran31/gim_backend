@@ -18,11 +18,11 @@ class SocioModel {
     }
 
     createSocio = (socio, callback) => {
-        db.query('INSERT INTO socio (nombre, apellido, dni, telefono, activo, idGimnasio) VALUES (?, ?, ?, ?, ?, ?);', [socio.nombre, socio.apellido, socio.dni, socio.telefono, socio.activo, socio.idGimnasio], callback);
+        db.query('INSERT INTO socio (nombre, apellido, dni, telefono, activo, diaDePago, idGimnasio) VALUES (?, ?, ?, ?, ?, ?, ?);', [socio.nombre, socio.apellido, socio.dni, socio.telefono, socio.activo, socio.idGimnasio], callback);
     }
 
     updateSocio = (socio, callback) => {
-        db.query('UPDATE socio SET nombre = ?, apellido = ?, dni = ?, telefono = ?, activo = ?, idGimnasio = ? WHERE idSocio = ?;', [socio.nombre, socio.apellido, socio.dni, socio.telefono, socio.activo, socio.idGimnasio, socio.idSocio], callback);
+        db.query('UPDATE socio SET nombre = ?, apellido = ?, dni = ?, telefono = ?, activo = ?, diaDePago = ?, idGimnasio = ? WHERE idSocio = ?;', [socio.nombre, socio.apellido, socio.dni, socio.telefono, socio.activo, socio.diaDePago, socio.idGimnasio, socio.idSocio], callback);
     }
 
 
