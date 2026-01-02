@@ -25,7 +25,7 @@ class ingresoController {
                 if (err) {
                     throw new Error('Error al obtener la inscripción');
                 } else {
-                    res.status(200).json(data[0]);
+                    res.status(200).json(data);
                 }
             });
         } catch (error) {

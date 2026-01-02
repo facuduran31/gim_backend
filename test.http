@@ -1,1 +1,5 @@
 GET http://localhost:3000/historico-precios/plan/11 HTTP/1.1
+
+###
+
+GET http://localhost:3000/ingresos/7
