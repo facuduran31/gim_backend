@@ -2,84 +2,51 @@ const pagoModel = require('../models/pago');
 const pagoSchema = require('../interfaces/pago');
 
 class PagoController {
+
     getAll = (req, res) => {
-        try {
-            pagoModel.getAll((err, data) => {
-                if (err) throw new Error('Error al obtener los pagos');
-                res.json(data);
-            });
-        } catch (error) {
-            res.status(500).json({ message: error.message });
-        }
+        pagoModel.getAll((err, data) => {
+            if (err) return res.status(500).json(err);
+            res.json(data);
+        });
     }
 
     getById = (req, res) => {
-        const id = req.params.id;
-        try {
-            pagoModel.getById(id, (err, data) => {
-                if (err) throw new Error('Error al obtener el pago');
-                res.json(data[0]);
-            });
-        } catch (error) {
-            res.status(500).json({ message: error.message });
-        }
+        pagoModel.getById(req.params.id, (err, data) => {
+            if (err) return res.status(500).json(err);
+            res.json(data[0]);
+        });
+    }
+
+    // 🔥 ESTE ES EL QUE TE FALTABA
+    getBySocioPlan = (req, res) => {
+        const { idSocioPlan } = req.params;
+
+        pagoModel.getBySocioPlan(idSocioPlan, (err, data) => {
+            if (err) return res.status(500).json(err);
+            res.json(data);
+        });
     }
 
     create = (req, res) => {
         const nuevo = req.body;
-        try {
-            const valido = pagoSchema.safeParse(nuevo);
-            if (valido.success) {
-                pagoModel.create(nuevo, (err, data) => {
-                    if (err) throw new Error('Error al crear el pago');
-                    res.json({ message: 'Pago creado correctamente' });
-                });
-            } else {
-                throw new Error(valido.error.errors[0].message);
-            }
-        } catch (error) {
-            res.status(500).json({ message: error.message });
+
+        const valido = pagoSchema.safeParse(nuevo);
+        if (!valido.success) {
+            return res.status(400).json(valido.error.errors);
         }
-    }
 
-    update = (req, res) => {
-        const datosNuevos = req.body;
-        datosNuevos.id = parseInt(req.params.id);
-
-        try {
-            pagoModel.getById(datosNuevos.id, (err, registro) => {
-                if (err) throw new Error('Error al actualizar el pago');
-                if (!registro) throw new Error('Registro no encontrado');
-
-                const actualizado = { ...registro[0], ...datosNuevos };
-                const valido = pagoSchema.safeParse(actualizado);
-
-                if (valido.success) {
-                    pagoModel.update(actualizado, (err, data) => {
-                        if (err) throw new Error('Error al actualizar el pago');
-                        res.json({ message: 'Pago actualizado correctamente' });
-                    });
-                } else {
-                    throw new Error(valido.error.errors[0].message);
-                }
-            });
-        } catch (error) {
-            res.status(500).json({ message: error.message });
-        }
+        pagoModel.create(nuevo, (err) => {
+            if (err) return res.status(500).json(err);
+            res.json({ message: 'Pago creado correctamente' });
+        });
     }
 
     delete = (req, res) => {
-        const id = req.params.id;
-        try {
-            pagoModel.delete(id, (err, data) => {
-                if (err) throw new Error('Error al eliminar el pago');
-                res.json({ message: 'Pago eliminado correctamente' });
-            });
-        } catch (error) {
-            res.status(500).json({ message: error.message });
-        }
+        pagoModel.delete(req.params.id, (err) => {
+            if (err) return res.status(500).json(err);
+            res.json({ message: 'Pago eliminado correctamente' });
+        });
     }
 }
 
 module.exports = new PagoController();
-
