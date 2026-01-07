@@ -84,7 +84,7 @@ class planController {
     }
 
     
-     updatePlan = (req, res) => {
+    updatePlan = (req, res) => {
         const plan = req.body;
         plan.id = parseInt(req.params.id);
 

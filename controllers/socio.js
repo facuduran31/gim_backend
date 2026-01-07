@@ -116,71 +116,66 @@ class SocioController {
     };
 
   updateSocio = (req, res) => {
-    const { idPlan, duracion, estado, ...datosSocio } = req.body;
-    const idSocio = parseInt(req.params.id);
+    const { idSocio, dni, nombre, apellido, telefono, estado, idGimnasio, idPlan, duracion } = req.body;
 
-    const socio = {
-      ...datosSocio,
-      activo: estado === true || estado === 1,
-      idSocio
-    };
+    const socio = { idSocio, dni, nombre, apellido, telefono, activo: estado, idGimnasio };
 
-        try {
-          // Validación Zod
-          const socioValido = socioSchema.safeParse(socio);
-          if (!socioValido.success) {
+    // Validación Zod
+    try {
+        const socioValido = socioSchema.safeParse(socio);
+        if (!socioValido.success) {
             console.log("Error de validación:", socioValido.error.errors);
             return res.status(400).json({ error: socioValido.error.errors[0].message });
-          }
-
-          // Actualizar datos del socio
-          socioModel.updateSocio(socio, (err, data) => {
-            if (err) {
-              console.log("Error al actualizar socio:", err);
-              return res.status(500).json({ error: err.message });
-            }
-
-            // crear nuevo socio_plan
-            if (idPlan) {
-              // Obtener último plan
-              socioModel.getUltimoPlan(idSocio, (err2, ultimoPlan) => {
-                if (err2) {
-                  console.log("Error al obtener último plan:", err2);
-                  return res.status(500).json({ error: err2.message });
-                }
-
-                const fechaInicio = ultimoPlan.length > 0
-                  ? new Date(new Date(ultimoPlan[0].fechaFin).getTime() + 24*60*60*1000) // un día después del último fin
-                  : new Date();
-
-                const fechaFin = new Date(fechaInicio);
-                fechaFin.setMonth(fechaFin.getMonth() + (parseInt(duracion) || 1));
-
-                const nuevoPlan = { idSocio, idPlan, fechaInicio, fechaFin };
-
-                socioModel.createSocioPlan(nuevoPlan, (err3, data3) => {
-                  if (err3) {
-                    console.log("Error al crear socio_plan:", err3);
-                    return res.status(500).json({ error: err3.message });
-                  }
-
-                  res.status(200).json({
-                    message: "Socio actualizado y nuevo plan creado",
-                    idSocio,
-                    idSocioPlan: data3.insertId
-                  });
-                });
-              });
-            } else {
-              res.status(200).json({ message: "Socio actualizado correctamente", idSocio });
-            }
-          });
-
-        } catch (error) {
-          console.log("Error general:", error);
-          return res.status(500).json({ error: error.message });
         }
+
+        // Actualizar socio
+        socioModel.updateSocio(socio, (err, data) => {
+            if (err) return res.status(500).json({ error: err.message });
+
+            // Si hay un plan para actualizar
+            if (idPlan) {
+                // Obtener último plan del socio
+                socioModel.getUltimoPlan(idSocio, (err2, planes) => {
+                    if (err2) return res.status(500).json({ error: err2.message });
+
+                    const ultimoPlan = planes[0]; // si existe
+                    let fechaInicio = new Date();
+                    if (ultimoPlan) {
+                        fechaInicio = new Date(ultimoPlan.fechaFin);
+                        fechaInicio.setDate(fechaInicio.getDate() + 1); // empieza al día siguiente
+                    }
+                    const fechaFin = new Date(fechaInicio);
+                    fechaFin.setMonth(fechaFin.getMonth() + duracion);
+
+                    // Crear nuevo socio_plan solo si el plan es distinto
+                    if (!ultimoPlan || ultimoPlan.idPlan !== idPlan) {
+                        const socioPlan = { idSocio, idPlan, fechaInicio, fechaFin };
+                        socioModel.createSocioPlan(socioPlan, (err3, data3) => {
+                            if (err3) return res.status(500).json({ error: err3.message });
+                            return res.status(200).json({
+                                message: 'Socio actualizado y plan cambiado',
+                                idSocio,
+                                idSocioPlan: data3.insertId
+                            });
+                        });
+                    } else {
+                        // Plan no cambió
+                        return res.status(200).json({ message: 'Socio actualizado correctamente', idSocio });
+                    }
+                });
+            } else {
+                // No se envió idPlan
+                return res.status(200).json({ message: 'Socio actualizado correctamente', idSocio });
+            }
+        });
+
+    } catch (error) {
+        console.log("Error general:", error);
+        return res.status(500).json({ error: error.message });
     }
+};
+
+
 
     deleteSocio = (req, res) => {
         const idSocio = req.params.id;
