@@ -43,6 +43,18 @@ class planController {
 
     }
 
+    getPlanActualByIdSocio = (req, res) => {
+        const idSocio = req.params.idSocio;
+        try {
+            planModel.getPlanActualByIdSocio(idSocio, (err, data) => {
+                if(err) throw new Error('Error al obtener el plan actual del socio');
+                res.status(200).json(data[0]);
+            });
+        } catch (error) {
+            res.status(500).json({ error: error.message })
+        }
+    }
+
     createPlan = (req, res) => {
         const plan = req.body;
         try {

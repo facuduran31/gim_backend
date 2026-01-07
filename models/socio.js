@@ -1,153 +1,75 @@
-const db = require('./db.js');
+const db = require('./db');
 
 class SocioModel {
 
-    // ==============================
-    // OBTENER TODOS LOS SOCIOS
-    // ==============================
-    getAllSocios = (callback) => {
-        db.query(`
-            SELECT 
-                s.*,
-                sp.idSocioPlan
-            FROM socio s
-            LEFT JOIN socio_plan sp 
-                ON sp.idSocio = s.idSocio
-                AND (sp.fechaFin IS NULL OR sp.fechaFin >= CURDATE());
-        `, callback);
+    getAllSocios(callback) {
+        db.query('SELECT * FROM socio;', callback);
     }
 
-    // ==============================
-    // OBTENER SOCIO POR ID
-    // ==============================
-    getSocioById = (idSocio, callback) => {
-        db.query(`
-            SELECT 
-                s.*,
-                sp.idSocioPlan
-            FROM socio s
-            LEFT JOIN socio_plan sp 
-                ON sp.idSocio = s.idSocio
-                AND (sp.fechaFin IS NULL OR sp.fechaFin >= CURDATE())
-            WHERE s.idSocio = ?;
-        `, [idSocio], callback);
+    getSocioById(idSocio, callback) {
+        db.query('SELECT * FROM socio WHERE idSocio = ?;', [idSocio], callback);
     }
 
-    // ==============================
-    // OBTENER SOCIO POR DNI
-    // ==============================
-    getSocioByDni = (dni, callback) => {
-        db.query(`
-            SELECT 
-                s.*,
-                sp.idSocioPlan
-            FROM socio s
-            LEFT JOIN socio_plan sp 
-                ON sp.idSocio = s.idSocio
-                AND (sp.fechaFin IS NULL OR sp.fechaFin >= CURDATE())
-            WHERE s.dni = ?;
-        `, [dni], callback);
+    getSocioByDni(dni, callback) {
+        db.query('SELECT * FROM socio WHERE dni = ?;', [dni], callback);
     }
 
-    // ==============================
-    // OBTENER SOCIOS POR GIMNASIO
-    // ==============================
-    getSociosByGimnasio = (idGimnasio, callback) => {
-        db.query(`
-            SELECT 
-                s.*,
-                sp.idSocioPlan
-            FROM socio s
-            LEFT JOIN socio_plan sp 
-                ON sp.idSocio = s.idSocio
-                AND (sp.fechaFin IS NULL OR sp.fechaFin >= CURDATE())
-            WHERE s.idGimnasio = ?;
-        `, [idGimnasio], callback);
+    getSociosByGimnasio(idGimnasio, callback) {
+        db.query('SELECT * FROM socio WHERE idGimnasio = ?;', [idGimnasio], callback);
     }
 
-    // ==============================
-    // CREAR SOCIO
-    // ==============================
-    createSocio = (socio, callback) => {
-        db.query(`
-            INSERT INTO socio 
-                (nombre, apellido, dni, telefono, activo, diaDePago, idGimnasio)
-            VALUES (?, ?, ?, ?, ?, ?, ?);
-        `, [
-            socio.nombre,
-            socio.apellido,
-            socio.dni,
-            socio.telefono,
-            socio.activo,
-            socio.diaDePago,
-            socio.idGimnasio
-        ], callback);
+    createSocio(socio, callback) {
+        const { dni, nombre, apellido, telefono, activo, idGimnasio } = socio;
+        db.query(
+            'INSERT INTO socio (dni, nombre, apellido, telefono, activo, idGimnasio) VALUES (?, ?, ?, ?, ?, ?);',
+            [dni, nombre, apellido, telefono, activo, idGimnasio],
+            callback
+        );
     }
 
-    // ==============================
-    // ACTUALIZAR SOCIO
-    // ==============================
-    updateSocio = (socio, callback) => {
-        db.query(`
-            UPDATE socio 
-            SET 
-                nombre = ?, 
-                apellido = ?, 
-                dni = ?, 
-                telefono = ?, 
-                activo = ?, 
-                diaDePago = ?, 
-                idGimnasio = ?
-            WHERE idSocio = ?;
-        `, [
-            socio.nombre,
-            socio.apellido,
-            socio.dni,
-            socio.telefono,
-            socio.activo,
-            socio.diaDePago,
-            socio.idGimnasio,
-            socio.idSocio
-        ], callback);
+    updateSocio(socio, callback) {
+        const { idSocio, dni, nombre, apellido, telefono, activo, idGimnasio } = socio;
+        db.query(
+            'UPDATE socio SET dni=?, nombre=?, apellido=?, telefono=?, activo=?, idGimnasio=? WHERE idSocio=?;',
+            [dni, nombre, apellido, telefono, activo, idGimnasio, idSocio],
+            callback
+        );
     }
 
-    // ==============================
-    // ELIMINAR SOCIO
-    // ==============================
-    deleteSocio = (idSocio, callback) => {
-        db.query(`
-            DELETE FROM socio 
-            WHERE idSocio = ?;
-        `, [idSocio], callback);
+    deleteSocio(idSocio, callback) {
+        db.query('DELETE FROM socio WHERE idSocio=?;', [idSocio], callback);
     }
 
-    // ==============================
-    // VALIDAR INGRESO POR DNI
-    // ==============================
-    validarIngreso = (dni, callback) => {
-        db.query(`
-            SELECT 
-                s.idSocio,
-                s.nombre,
-                s.apellido,
-                s.activo,
-                s.diaDePago,
-                sp.idSocioPlan,
-                p.idPlan,
-                p.nombre AS nombrePlan,
-                p.duracion,
-                g.idGimnasio
-            FROM socio s
-            INNER JOIN socio_plan sp 
-                ON sp.idSocio = s.idSocio
-                AND (sp.fechaFin IS NULL OR sp.fechaFin >= CURDATE())
-            INNER JOIN plan p 
-                ON p.idPlan = sp.idPlan
-            INNER JOIN gimnasio g 
-                ON g.idGimnasio = p.idGimnasio
-            WHERE s.dni = ?;
-        `, [dni], callback);
+    validarIngreso(dni, callback) {
+        db.query('SELECT * FROM socio WHERE dni=?;', [dni], callback);
     }
+
+    getUltimoPlan(idSocio, callback) {
+        db.query(
+            'SELECT * FROM socio_plan WHERE idSocio=? ORDER BY fechaFin DESC LIMIT 1;',
+            [idSocio],
+            callback
+        );
+    }
+
+    createSocioPlan(socioPlan, callback) {
+        const { idSocio, idPlan, fechaInicio, fechaFin } = socioPlan;
+        db.query(
+            'INSERT INTO socio_plan (idSocio, idPlan, fechaInicio, fechaFin) VALUES (?, ?, ?, ?);',
+            [idSocio, idPlan, fechaInicio, fechaFin],
+            callback
+        );
+    }
+
+    updateSocioPlan(socioPlan, callback) {
+        const { idSocioPlan, idPlan, fechaInicio, fechaFin } = socioPlan;
+        db.query(
+            'UPDATE socio_plan SET idPlan=?, fechaInicio=?, fechaFin=? WHERE idSocioPlan=?;',
+            [idPlan, fechaInicio, fechaFin, idSocioPlan],
+            callback
+        );
+    }
+
 }
 
 module.exports = new SocioModel();
