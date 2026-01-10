@@ -2,8 +2,8 @@ const router = require('express').Router();
 const ingresoController = require('../controllers/ingreso');
 const { validateToken } = require('../middlewares/token');
 
-
 router.get('/', validateToken, ingresoController.getAllIngresos);
+router.post('/validar', validateToken, ingresoController.validarIngreso);
 router.get('/:idGimnasio', ingresoController.getIngresosByIdGimnasio);
 router.post('/', validateToken, ingresoController.createIngreso);
 router.patch('/:idIngreso', validateToken, ingresoController.updateIngreso);

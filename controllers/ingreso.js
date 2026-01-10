@@ -1,105 +1,118 @@
 const ingresoModel = require('../models/ingreso.js');
 const ingresoSchema = require('../interfaces/ingreso.js');
 
-class ingresoController {
+class IngresoController {
 
     getAllIngresos = (req, res) => {
-        try {
-            ingresoModel.getAllIngresos((err, data) => {
-                if (err) {
-                    throw new Error('Error al obtener los ingresos');
-                } else {
-                    res.status(200).json(data);
-                }
-            });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-
+        ingresoModel.getAllIngresos((err, data) => {
+            if (err) return res.status(500).json({ error: 'Error al obtener los ingresos' });
+            res.status(200).json(data);
+        });
     }
 
     getIngresosByIdGimnasio = (req, res) => {
         const idGimnasio = req.params.idGimnasio;
-        try {
-            ingresoModel.getIngresosByIdGimnasio(idGimnasio, (err, data) => {
-                if (err) {
-                    throw new Error('Error al obtener la inscripción');
-                } else {
-                    res.status(200).json(data);
-                }
-            });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
 
-        }
-
+        ingresoModel.getIngresosByIdGimnasio(idGimnasio, (err, data) => {
+            if (err) return res.status(500).json({ error: 'Error al obtener los ingresos' });
+            res.status(200).json(data);
+        });
     }
 
-    createIngreso = async (req, res) => {
-        const ingreso = req.body;
-            try {
-                const ingresoValida = ingresoSchema.safeParse(ingreso);
-                if (ingresoValida.success) {
-                    ingreso.fechaIngreso = ingreso.fechaIngreso.split('T')[0];
-                    ingresoModel.createIngreso(ingreso, (err, data) => {
-                        if (err) {
-                            throw new Error('Error al crear la ingreso');
-                        } else {
-                            res.status(201).json({ message: 'ingreso creada con éxito' });
-                        }
-                    });
-                }
-                else {
-                    throw new Error(ingresoValida.error.errors[0].message);
-                }
-            } catch (error) {
-                res.status(500).json({ error: error.message });
+    validarIngreso = async (req, res) => {
+        const { dni, idGimnasio } = req.body;
+        
+        try {
+            // 1) Buscar el socio por DNI
+            const socio = await new Promise((resolve, reject) => {
+                ingresoModel.getSocioByDni(dni, idGimnasio, (err, data) => {
+                    if (err) reject(err);
+                    else resolve(data[0]);
+                });
+            });
+        
+            if (!socio) {
+                return res.status(404).json({ error: "Socio no encontrado" });
             }
+        
+            // 2) Consultar si tiene un plan activo
+            const plan = await new Promise((resolve, reject) => {
+                ingresoModel.getPlanActivo(socio.idSocio, (err, data) => {
+                    if (err) reject(err);
+                    else resolve(data[0]);
+                });
+            });
+        
+            if (!plan) {
+                return res.status(403).json({ error: "El socio no tiene un plan activo" });
+            }
+        
+            // 3) Crear ingreso válido
+            const ingresoNuevo = {
+                idGimnasio,
+                idSocio: socio.idSocio,
+                fechaIngreso: new Date().toISOString().split("T")[0],
+                horaIngreso: new Date().toTimeString().split(" ")[0],
+                esValido: true
+            };
+        
+            ingresoModel.createIngreso(ingresoNuevo, (err) => {
+                if (err) throw err;
+                res.status(201).json({ message: "Ingreso validado y registrado con éxito" });
+            });
+        
+        } catch (error) {
+            res.status(500).json({ error: error.message });
         }
+    }
+
+
+    createIngreso = (req, res) => {
+        const ingreso = req.body;
+
+        const valido = ingresoSchema.safeParse(ingreso);
+        if (!valido.success) {
+            return res.status(400).json({ error: valido.error.errors[0].message });
+        }
+
+        // Ajustar formato de fecha
+        ingreso.fechaIngreso = new Date(ingreso.fechaIngreso)
+            .toISOString()
+            .split('T')[0];
+
+        ingresoModel.createIngreso(ingreso, (err) => {
+            if (err) return res.status(500).json({ error: 'Error al crear el ingreso' });
+            res.status(201).json({ message: 'Ingreso creado con éxito' });
+        });
+    }
 
     updateIngreso = (req, res) => {
         const ingreso = req.body;
-        ingreso.idSocioPlan = req.params.idSocioPlan;
+        ingreso.id = req.params.idIngreso;
 
-        try {
-            const ingresoValida = ingresoSchema.safeParse(ingreso);
-
-            if (ingresoValida.success) {
-                ingreso.fechaIngreso = ingreso.fechaIngreso.split('T')[0];
-                ingresoModel.updateIngreso(ingreso, (err, data) => {
-                    if (err) {
-                        throw new Error('Error al actualizar el ingreso');
-                    } else {
-                        res.status(200).json({ message: 'ingreso actualizado con éxito' });
-                    }
-                });
-            }
-            else {
-                throw new Error(ingresoValida.error.errors[0].message);
-            }
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-
+        const valido = ingresoSchema.safeParse(ingreso);
+        if (!valido.success) {
+            return res.status(400).json({ error: valido.error.errors[0].message });
         }
 
+        ingreso.fechaIngreso = new Date(ingreso.fechaIngreso)
+            .toISOString()
+            .split('T')[0];
+
+        ingresoModel.updateIngreso(ingreso, (err) => {
+            if (err) return res.status(500).json({ error: 'Error al actualizar el ingreso' });
+            res.status(200).json({ message: 'Ingreso actualizado con éxito' });
+        });
     }
 
     deleteIngreso = (req, res) => {
-        const id = req.params.id;
-        try {
-            ingresoModel.deleteingreso(id, (err, data) => {
-                if (err) {
-                    console.log(err)
+        const id = req.params.idIngreso;
 
-                    throw new Error('Error al eliminar el ingreso');
-                } else {
-                    res.status(200).json({ message: 'ingreso eliminado con éxito' });
-                }
-            });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
+        ingresoModel.deleteIngreso(id, (err) => {
+            if (err) return res.status(500).json({ error: 'Error al eliminar el ingreso' });
+            res.status(200).json({ message: 'Ingreso eliminado con éxito' });
+        });
     }
 }
 
-module.exports = new ingresoController();
+module.exports = new IngresoController();

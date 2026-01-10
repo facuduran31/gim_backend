@@ -6,8 +6,8 @@ const ingresoSchema = z.object({
   idGimnasio: z.coerce.number().int().positive(),
   idSocio: z.coerce.number().int().positive(),
 
-  // Fecha tipo YYYY-MM-DD o ISO
-  fechaGimnasio: z.coerce.date(),
+  // Fecha tipo YYYY-MM-DD
+  fechaIngreso: z.coerce.date(),
 
   // Hora tipo "HH:mm" o "HH:mm:ss"
   horaIngreso: z
