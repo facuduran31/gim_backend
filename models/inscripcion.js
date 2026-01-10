@@ -15,7 +15,20 @@ class inscripcionModel {
     }
 
     getInscripcionActual(idSocio, callback) {
-        db.query('SELECT * FROM socio_plan where idSocio = ? order by fechaFin desc;', [idSocio], callback)
+        db.query(`
+    SELECT 
+        sp.*,
+        p.nombre AS nombrePlan
+    FROM 
+        socio_plan sp
+    INNER JOIN 
+        plan p ON sp.idPlan = p.idPlan
+    WHERE 
+        sp.idSocio = ?
+    ORDER BY 
+        sp.fechaFin DESC;
+`, [idSocio], callback);
+
     }
 
 
