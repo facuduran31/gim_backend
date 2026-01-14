@@ -5,7 +5,8 @@ const pagoSchema = z.object({
     idSocioPlan: z.number().int().positive(),
     idMetodoPago: z.number().int().positive(),
     monto: z.number().positive(),
-    fechaPago: z.string() // viene como YYYY-MM-DD
+    fechaPago: z.string(), // viene como YYYY-MM-DD
+    deletedAt: z.date().optional()
 });
 
 module.exports = pagoSchema;

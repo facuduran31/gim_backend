@@ -2,12 +2,12 @@ const db = require('./db.js');
 
 class IngresoModel {
     getAllIngresos = (callback) => {
-        db.query('SELECT * FROM ingreso', callback);
+        db.query('SELECT * FROM ingreso WHERE deletedAt IS NULL', callback);
     }
 
     getIngresosByIdGimnasio = (id, callback) => {
         db.query(
-            'SELECT * FROM ingreso WHERE idGimnasio = ? ORDER BY fechaIngreso ASC',
+            'SELECT * FROM ingreso WHERE idGimnasio = ? AND deletedAt IS NULL ORDER BY fechaIngreso ASC',
             [id],
             callback
         );
@@ -15,7 +15,7 @@ class IngresoModel {
 
     getSocioByDni = (dni, idGimnasio, callback) => {
         db.query(
-            "SELECT * FROM socio WHERE dni = ? AND idGimnasio = ?", 
+            "SELECT * FROM socio WHERE dni = ? AND idGimnasio = ? AND deletedAt IS NULL", 
             [dni, idGimnasio], 
             callback
         );
@@ -26,7 +26,8 @@ class IngresoModel {
             `SELECT * FROM socio_plan 
              WHERE idSocio = ? 
              AND fechaInicio <= CURDATE() 
-             AND fechaFin >= CURDATE()`,
+             AND fechaFin >= CURDATE()
+             AND deletedAt IS NULL`,
             [idSocio],
             callback
         );
@@ -67,11 +68,7 @@ class IngresoModel {
     }
 
     deleteIngreso = (id, callback) => {
-        db.query(
-            'DELETE FROM ingreso WHERE idIngreso = ?',
-            [id],
-            callback
-        );
+        db.query('UPDATE ingreso SET deletedAt=NOW() WHERE idIngreso = ?', [id], callback);
     }
 }
 

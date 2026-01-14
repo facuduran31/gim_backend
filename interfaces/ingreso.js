@@ -14,7 +14,8 @@ const ingresoSchema = z.object({
     .string()
     .regex(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/, 'Hora inválida'),
 
-  esValido: z.boolean()
+  esValido: z.boolean(),
+  deletedAt: z.date().optional()
 });
 
 module.exports = ingresoSchema;

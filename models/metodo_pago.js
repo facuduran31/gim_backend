@@ -2,11 +2,11 @@ const db = require('./db.js');
 
 class MetodoPagoModel {
     getAll = (callback) => {
-        db.query('SELECT * FROM metodo_pago', callback);
+        db.query('SELECT * FROM metodo_pago WHERE deletedAt IS NULL', callback);
     }
 
     getById = (id, callback) => {
-        db.query('SELECT * FROM metodo_pago WHERE idMetodoPago = ?', [id], callback);
+        db.query('SELECT * FROM metodo_pago WHERE idMetodoPago = ? AND deletedAt IS NULL', [id], callback);
     }
 
     create = (metodo, callback) => {
@@ -26,7 +26,7 @@ class MetodoPagoModel {
     }
 
     delete = (id, callback) => {
-        db.query('DELETE FROM metodo_pago WHERE idMetodoPago = ?', [id], callback);
+        db.query('UPDATE metodo_pago SET deletedAt=NOW() WHERE idMetodoPago = ?', [id], callback);
     }
 }
 

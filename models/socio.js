@@ -3,19 +3,19 @@ const db = require('./db');
 class SocioModel {
 
     getAllSocios(callback) {
-        db.query('SELECT * FROM socio;', callback);
+        db.query('SELECT * FROM socio WHERE deletedAt IS NULL;', callback);
     }
 
     getSocioById(idSocio, callback) {
-        db.query('SELECT * FROM socio WHERE idSocio = ?;', [idSocio], callback);
+        db.query('SELECT * FROM socio WHERE idSocio = ? AND deletedAt IS NULL;', [idSocio], callback);
     }
 
     getSocioByDni(dni, callback) {
-        db.query('SELECT * FROM socio WHERE dni = ?;', [dni], callback);
+        db.query('SELECT * FROM socio WHERE dni = ? AND deletedAt IS NULL;', [dni], callback);
     }
 
     getSociosByGimnasio(idGimnasio, callback) {
-        db.query('SELECT * FROM socio WHERE idGimnasio = ?;', [idGimnasio], callback);
+        db.query('SELECT * FROM socio WHERE idGimnasio = ? AND deletedAt IS NULL;', [idGimnasio], callback);
     }
 
     createSocio(socio, callback) {
@@ -37,16 +37,17 @@ class SocioModel {
     }
 
     deleteSocio(idSocio, callback) {
-        db.query('DELETE FROM socio WHERE idSocio=?;', [idSocio], callback);
+        db.query('UPDATE socio SET deletedAt=NOW() WHERE idSocio = ?', [idSocio], callback);
+
     }
 
     validarIngreso(dni, callback) {
-        db.query('SELECT * FROM socio WHERE dni=?;', [dni], callback);
+        db.query('SELECT * FROM socio WHERE dni=? AND deletedAt IS NULL;', [dni], callback);
     }
 
     getUltimoPlan(idSocio, callback) {
         db.query(
-            'SELECT * FROM socio_plan WHERE idSocio=? ORDER BY fechaFin DESC LIMIT 1;',
+            'SELECT * FROM socio_plan WHERE idSocio=? ORDER BY fechaFin DESC LIMIT 1 AND deletedAt IS NULL;',
             [idSocio],
             callback
         );

@@ -3,11 +3,11 @@ const db = require('./db.js');
 class PagoModel {
 
     getAll = (callback) => {
-        db.query('SELECT * FROM pago', callback);
+        db.query('SELECT * FROM pago WHERE deletedAt IS NULL', callback);
     }
 
     getById = (id, callback) => {
-        db.query('SELECT * FROM pago WHERE idPago = ?', [id], callback);
+        db.query('SELECT * FROM pago WHERE idPago = ? AND deletedAt IS NULL', [id], callback);
     }
 
     getBySocioPlan = (idSocioPlan, callback) => {
@@ -23,6 +23,7 @@ class PagoModel {
             INNER JOIN metodo_pago mp 
                 ON mp.idMetodoPago = p.idMetodoPago
             WHERE p.idSocioPlan = ?
+            AND p.deletedAt IS NULL
             ORDER BY p.fechaPago DESC
         `, [idSocioPlan], callback);
     }
@@ -59,7 +60,7 @@ class PagoModel {
     }
 
     delete = (id, callback) => {
-        db.query('DELETE FROM pago WHERE idPago = ?', [id], callback);
+        db.query('UPDATE pago SET deletedAt=NOW() WHERE idPago = ?', [id], callback);
     }
 }
 

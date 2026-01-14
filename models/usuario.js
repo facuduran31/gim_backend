@@ -3,11 +3,11 @@ const db = require('./db.js');
 
 class UsuarioModel {
     getAllUsuarios = (callback) => {
-        db.query('SELECT * FROM usuario', callback);
+        db.query('SELECT * FROM usuario where deletedAt IS NULL', callback);
     }
 
     getUsuarioById = (id, callback) => {
-        db.query('SELECT * FROM usuario WHERE idUsuario = ?', [id], callback);
+        db.query('SELECT * FROM usuario WHERE idUsuario = ? AND deletedAt IS NULL', [id], callback);
     }
 
     createUsuario = (usuario, callback) => {
@@ -19,11 +19,11 @@ class UsuarioModel {
     }
 
     deleteUsuario = (id, callback) => {
-        db.query('DELETE FROM usuario WHERE idUsuario = ?', [id], callback);
+        db.query('UPDATE usuario SET deletedAt=NOW() WHERE idUsuario = ?', [id], callback);
     }
 
     getUserByMail = (mail, callback) => {
-        db.query('SELECT * FROM usuario WHERE mail = ?', [mail], callback);
+        db.query('SELECT * FROM usuario WHERE mail = ? AND deletedAt IS NULL', [mail], callback);
     }
 
     updatePassword = (mail, password, callback) => {
