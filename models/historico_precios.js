@@ -25,7 +25,7 @@ class historicoPreciosModel {
     // Obtener el histórico completo de un plan
     getHistoricoByPlan = (idPlan, callback) => {
         db.query(
-            `SELECT * FROM historico_precios WHERE idPlan = ? ORDER BY fechaDesde DESC`,
+            `SELECT * FROM historico_precios WHERE idPlan = ? AND deletedAt IS NULL ORDER BY fechaDesde DESC`,
             [idPlan],
             callback
         );
@@ -34,7 +34,7 @@ class historicoPreciosModel {
     // Obtener el ultimo histórico de un plan
     getUltimoHistoricoByPlan = (idPlan, callback) => {
         db.query(
-            `SELECT * FROM historico_precios WHERE idPlan = ? ORDER BY fechaDesde DESC LIMIT 1`,
+            `SELECT * FROM historico_precios WHERE idPlan = ? AND deletedAt IS NULL ORDER BY fechaDesde DESC LIMIT 1`,
             [idPlan],
             callback
         );

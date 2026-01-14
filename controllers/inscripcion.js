@@ -61,7 +61,6 @@ class inscripcionController {
         try {
             inscripcionModel.getInscripcionActual(idSocio, (err, data) => {
                 if (err) {
-                    console.log(err)
                     throw new Error('Error al obtener las inscripciones');
                 } else {
                     res.status(200).json(data[0]);
@@ -155,7 +154,6 @@ class inscripcionController {
         try {
             inscripcionModel.deleteInscripcion(idSocioPlan, (err, data) => {
                 if (err) {
-                    console.log(err)
 
                     throw new Error('Error al eliminar la inscripcion');
                 } else {

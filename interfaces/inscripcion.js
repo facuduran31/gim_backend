@@ -5,7 +5,8 @@ const inscripcionSchema = z.object({
   idSocio: z.number().int().positive(),
   idPlan: z.number().int().positive(),
   fechaInicio: z.string(),
-  fechaFin: z.string()
+  fechaFin: z.string(),
+  deletedAt: z.date().optional()
 });
 
 module.exports = inscripcionSchema;

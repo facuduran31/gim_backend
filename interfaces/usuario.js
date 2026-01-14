@@ -5,7 +5,8 @@ const usuarioSchema = z.object({
   nombre: z.string(),
   apellido: z.string(),
   mail: z.string().email(),
-  password: z.string()
+  password: z.string(),
+  deletedAt: z.date().optional()
 });
 
 const loginschema = z.object({

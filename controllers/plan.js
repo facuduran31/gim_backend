@@ -60,6 +60,7 @@ class planController {
         try {
             const planValido = planSchema.safeParse(plan);
 
+
             if (!planValido.success) throw new Error(planValido.error.errors[0].message);
 
             planModel.createPlan(plan, (err, data) => {

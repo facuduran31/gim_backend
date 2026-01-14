@@ -7,7 +7,8 @@ const planSchema = z.object({
   precio: z.number().positive(),
   duracion: z.number().int().positive(),
   diasPorSemana: z.number().int().positive().optional(), //ver como resolver esto
-  idGimnasio: z.number().int().positive()
+  idGimnasio: z.number().int().positive(),
+  deletedAt: z.date().optional()
 });
 
 module.exports = planSchema;

@@ -5,7 +5,8 @@ const historico_preciosSchema = z.object({
     idPlan: z.number().int(),
     precio: z.number().positive(),
     fechaDesde: z.date(),
-    fechaHasta: z.date()
+    fechaHasta: z.date(),
+    deletedAt: z.date().optional()
 });
 
 module.exports = historico_preciosSchema;
