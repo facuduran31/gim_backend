@@ -7,7 +7,7 @@ const socioSchema = z.object({
   dni: z.string(),
   telefono: z.string(),
   activo: z.boolean(),
-  idGimnasio: z.number().int().positive()
+  idGimnasio: z.number().int().positive(),
 });
 
 module.exports = socioSchema;

@@ -6,12 +6,12 @@ const usuarioSchema = z.object({
   apellido: z.string(),
   mail: z.string().email(),
   password: z.string(),
-  deletedAt: z.date().optional()
+  deletedAt: z.date().optional(),
 });
 
 const loginschema = z.object({
   mail: z.string().email(),
-  password: z.string()
+  password: z.string(),
 });
 
 module.exports = { usuarioSchema, loginschema };

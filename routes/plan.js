@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const planController = require('../controllers/plan');
 const { validateToken } = require('../middlewares/token');
-const inscripcionController = require('../controllers/inscripcion')
+const inscripcionController = require('../controllers/inscripcion');
 
 router.get('/', validateToken, planController.getAllPlanes);
 router.get('/:id', validateToken, planController.getPlanById);

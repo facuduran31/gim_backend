@@ -5,7 +5,7 @@ const dbConfig = {
   host: 'localhost',
   user: 'root',
   password: 'root',
-  database: 'gimnasios_db', 
+  database: 'gimnasios_db',
 };
 
 // Crear la conexión a la base de datos.

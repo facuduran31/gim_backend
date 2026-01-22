@@ -6,7 +6,7 @@ const inscripcionSchema = z.object({
   idPlan: z.number().int().positive(),
   fechaInicio: z.string(),
   fechaFin: z.string(),
-  deletedAt: z.date().optional()
+  deletedAt: z.date().optional(),
 });
 
 module.exports = inscripcionSchema;

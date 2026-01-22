@@ -9,5 +9,4 @@ router.post('/', validateToken, historicoPreciosController.create);
 router.put('/:id', validateToken, historicoPreciosController.update);
 router.delete('/:id', validateToken, historicoPreciosController.delete);
 
-
 module.exports = router;

@@ -2,7 +2,6 @@ const router = require('express').Router();
 const SocioController = require('../controllers/socio');
 const { validateToken } = require('../middlewares/token');
 
-
 router.get('/', validateToken, SocioController.getAllSocios);
 router.get('/:id', validateToken, SocioController.getSocioById);
 router.get('/dni/:dni', validateToken, SocioController.getSocioByDni);

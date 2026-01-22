@@ -4,6 +4,7 @@ const { validateToken } = require('../middlewares/token');
 
 router.get('/', validateToken, usuarioController.getAllUsuarios);
 router.get('/:id', validateToken, usuarioController.getUsuarioById);
+router.get('/me', validateToken, usuarioController.getMe);
 router.post('/', usuarioController.createUsuario);
 router.put('/:id', validateToken, usuarioController.updateUsuario);
 router.delete('/:id', validateToken, usuarioController.deleteUsuario);

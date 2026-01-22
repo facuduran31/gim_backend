@@ -277,6 +277,13 @@ class UsuarioController {
         }
     }
 
+    getMe = (req, res) => {
+  // req.user viene del validateToken mejorado
+  if (!req.user) return res.status(401).json({ message: 'No autenticado' });
+  return res.json(req.user);
+};
+
+
 }
 
 module.exports = new UsuarioController();

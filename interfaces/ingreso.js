@@ -10,12 +10,10 @@ const ingresoSchema = z.object({
   fechaIngreso: z.coerce.date(),
 
   // Hora tipo "HH:mm" o "HH:mm:ss"
-  horaIngreso: z
-    .string()
-    .regex(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/, 'Hora inválida'),
+  horaIngreso: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/, 'Hora inválida'),
 
   esValido: z.boolean(),
-  deletedAt: z.date().optional()
+  deletedAt: z.date().optional(),
 });
 
 module.exports = ingresoSchema;
