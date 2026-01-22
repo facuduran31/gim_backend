@@ -33,6 +33,15 @@ class SocioController {
     });
   };
 
+  getSociosByGimnasioConPlanActual = (req, res) => {
+    const { idGimnasio } = req.params;
+
+    socioModel.getSociosByGimnasioConPlanActual(idGimnasio, (err, data) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(data);
+    });
+  };
+
   validarIngreso = (req, res) => {
     const dni = req.params.dni;
     socioModel.validarIngreso(dni, (err, data) => {

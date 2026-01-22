@@ -21,6 +21,70 @@ class SocioModel {
     );
   }
 
+  getSociosByGimnasioConPlanActual(idGimnasio, callback) {
+    const sql = `
+    SELECT
+      s.*,
+      p.idPlan,
+      p.nombre AS nombrePlan,
+      p.descripcion,
+      p.duracion,
+      p.diasPorSemana,
+      sp.fechaInicio,
+      sp.fechaFin
+    FROM socio s
+    LEFT JOIN socio_plan sp
+      ON sp.idSocio = s.idSocio
+      AND sp.deletedAt IS NULL
+      AND CURDATE() BETWEEN sp.fechaInicio AND sp.fechaFin
+    LEFT JOIN plan p
+      ON p.idPlan = sp.idPlan
+      AND p.deletedAt IS NULL
+    WHERE s.idGimnasio = ?
+      AND s.deletedAt IS NULL
+    ORDER BY s.apellido, s.nombre;
+  `;
+
+    db.query(sql, [idGimnasio], callback);
+  }
+
+  getByGimnasio = (idGimnasio, { from, to }, callback) => {
+    let sql = `
+    SELECT
+      p.idPago,
+      p.idSocioPlan,
+      p.idMetodoPago,
+      mp.nombre AS metodoPago,
+      p.monto,
+      p.fechaPago,
+      s.idSocio,
+      s.nombre,
+      s.apellido,
+      s.dni
+    FROM pago p
+    INNER JOIN socio_plan sp ON sp.idSocioPlan = p.idSocioPlan
+    INNER JOIN socio s ON s.idSocio = sp.idSocio
+    INNER JOIN metodo_pago mp ON mp.idMetodoPago = p.idMetodoPago
+    WHERE s.idGimnasio = ?
+      AND p.deletedAt IS NULL
+  `;
+
+    const params = [idGimnasio];
+
+    if (from) {
+      sql += ` AND p.fechaPago >= ?`;
+      params.push(from);
+    }
+    if (to) {
+      sql += ` AND p.fechaPago <= ?`;
+      params.push(to);
+    }
+
+    sql += ` ORDER BY p.fechaPago DESC`;
+
+    db.query(sql, params, callback);
+  };
+
   createSocio(socio, callback) {
     const { dni, nombre, apellido, telefono, activo, idGimnasio } = socio;
     db.query(
