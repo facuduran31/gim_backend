@@ -1,29 +1,41 @@
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
 
-const secret = process.env.JWT_SECRET;
+function extractToken(req) {
+  // 1) Cookie (preferred)
+  const cookieToken = req.cookies?.authToken;
+  if (cookieToken) return cookieToken;
 
-const generateToken = (usuario) => {
-  return jwt.sign(usuario, secret, { expiresIn: '1h' });
-};
+  // 2) Authorization header: Bearer <token>
+  const auth = req.headers.authorization;
+  if (!auth) return null;
 
-const validateToken = (req, res, next) => {
-  let token = req.cookies?.authToken || req.headers['authorization'];
+  const parts = auth.split(' ');
+  if (parts.length === 2 && parts[0] === 'Bearer') return parts[1];
 
-  if (!token) {
-    return res.status(401).json({ message: 'Token no proporcionado' });
-  }
+  return null;
+}
 
-  if (typeof token === 'string' && token.startsWith('Bearer ')) {
-    token = token.slice('Bearer '.length).trim();
-  }
+function validateToken(req, res, next) {
+  try {
+    const token = extractToken(req);
 
-  jwt.verify(token, secret, (err, user) => {
-    if (err) return res.status(401).json({ message: 'Token no válido' });
+    if (!token) {
+      return res.status(401).json({ message: 'Token requerido' });
+    }
 
-    req.user = user;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // payload disponible para controllers
     next();
-  });
-};
+  } catch (err) {
+    return res.status(401).json({ message: 'Token inválido o expirado' });
+  }
+}
 
-module.exports = { generateToken, validateToken };
+function generateToken(payload) {
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+}
+
+module.exports = {
+  validateToken,
+  generateToken,
+};

@@ -8,282 +8,286 @@ const jwt = require('jsonwebtoken');
 
 const mailContacto = process.env.MAIL_CONTACTO;
 
-
 class UsuarioController {
-    getAllUsuarios = (req, res) => {
-        try {
-            UsuarioModel.getAllUsuarios((err, data) => {
-                if (err) {
-                    throw new Error('Error al obtener los usuarios');
-                } else {
-                    res.status(200).json(data);
-                }
-            });     
-        } catch (error) {
-            res.status(500).json({ error: error.message });            
+  getAllUsuarios = (req, res) => {
+    try {
+      UsuarioModel.getAllUsuarios((err, data) => {
+        if (err) {
+          res.status(500).json({ error: 'Error al obtener usuarios' });
+        } else {
+          res.json(data);
         }
-
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
+  };
 
-    getUsuarioById = (req, res) => {
-        const id = req.params.id;
-        try {
-            UsuarioModel.getUsuarioById(id, (err, data) => {
-                if (err) {
-                    throw new Error('Error al obtener el usuario');
-                } else {
-                    res.ststus(200).json(data);
-                }
-            });
-        } catch (error) {
-            res.status(500).json({ error: error.message });            
+  getUsuarioById = (req, res) => {
+    const id = req.params.id;
+    try {
+      UsuarioModel.getUsuarioById(id, (err, data) => {
+        if (err) {
+          res.status(500).json({ error: 'Error al obtener usuario' });
+        } else {
+          res.json(data);
         }
-        
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
+  };
 
-    createUsuario = async (req, res) => {
-        const usuario = req.body;
-        try {
-            const usuarioValido = usuarioSchema.safeParse(usuario);
-            if (usuarioValido.success) {
-                const duplicado = await this.getUserByMail(usuario.mail);
-                if (!duplicado) {
-                    const contraEncriptada= await bcrypt.hash(usuario.password, 10); //Encripto la contraseña
-                    const usuarioEncriptado = {...usuario, password: contraEncriptada}; //Creo un nuevo objeto con la contraseña encriptada
-                    UsuarioModel.createUsuario(usuarioEncriptado, (err, data) => {
-                        if (err) {
-                            throw new Error('Error al crear el usuario');
-                        } else {
-                            res.json({ message: 'Usuario creado correctamente' });
-                        }
-                    });
-                } else {
-                    throw new Error('El mail ya se encuentra registrado');
-                }
-    
-            } else {
-                throw new Error(usuarioValido.error.errors[0].message);
-            }
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-       
+  createUsuario = (req, res) => {
+    const usuario = req.body;
+    const usuarioValido = usuarioSchema.safeParse(usuario);
 
-    }
+    try {
+      if (usuarioValido.success) {
+        const hashedPassword = bcrypt.hashSync(usuario.password, 10);
 
-    updateUsuario = async (req, res) => {
-        const usuario = req.body;
-        try {
-            usuario.id = parseInt(req.params.id);
-            const usuarioValido = usuarioSchema.safeParse(usuario);
-            if (usuarioValido.success) {
-                UsuarioModel.updateUsuario(usuario, (err, data) => {
-                    if (err) {
-                        throw new Error('Error al actualizar el usuario');
-                    } else {
-                        res.json({ message: 'Usuario actualizado correctamente' });
-                    }
-                });
-            } else {
-                throw new Error(usuarioValido.error.errors[0].message);
-            }
-        } catch (error) {
-            res.status(500).json({ error: error.message });            
-        }
-       
+        usuario.password = hashedPassword;
 
-    }
-
-    deleteUsuario = (req, res) => {
-        const id = req.params.id;
-        try {
-            UsuarioModel.deleteUsuario(id, (err, data) => {
-                if (err) {
-                    throw new Error('Error al eliminar el usuario');
-                } else {
-                    res.json({ message: 'Usuario eliminado correctamente' });
-                }
-            });
-        } catch (error) {
-            res.status(500).json({ error: error.message });            
-        }
-        
-    }
-
-    login=(req, res)=> {
-        const mail = req.body.mail;
-        const password = req.body.password;
-        const loginValido = loginschema.safeParse({ mail, password });
-        try{
-            if (loginValido.success) {
-            
-                UsuarioModel.getUserByMail(mail, (err, data) => {
-                    if (err) {
-                        res.status(500).json({ error: 'Error al iniciar sesión' });
-                    } else {
-    
-                        if (data.length > 0) {
-                            try{
-                                const isValid = bcrypt.compareSync(password, data[0].password);
-                                if (!isValid) {throw new Error('Contraseña incorrecta');}
-                            }
-                            catch(err){
-                                res.status(400).json({ error: 'Contraseña incorrecta' });
-                                return;
-                            }
-                            
-                            const payload = data[0];
-                            const token = generateToken(payload);
-                            const user = {id: payload.idUsuario, mail: payload.mail, nombre: payload.nombre, apellido: payload.apellido};
-                            req.session.user = user;
-                            req.session.save();
-    
-                            res
-                                .cookie('authToken', token, {
-                                    httpOnly: true,
-                                    secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
-                                    sameSite: 'strict',
-                                    maxAge: 1000 * 60 * 60 * 24 // 24 horas
-                                })
-                                .cookie('user', JSON.stringify(user), {
-                                    httpOnly: false,
-                                    secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
-                                    sameSite: 'strict',
-                                    maxAge: 1000 * 60 * 60 * 24 // 24 horas
-                                })
-                                .send({ message: 'Sesión iniciada correctamente' });
-                        } else {
-                            res.status(404).send({ error: 'Usuario no encontrado' });
-                        }
-    
-                    }
-                });
-            } else {
-                throw new Error(loginValido.error.errors[0].message);
-            }
-        }
-        catch(err){
-            res.status(400).json({ error: err.message });
-        }
-    }
-
-
-
-    logout=(req, res) => { //Termino la sesion y borro las cookies
-    
-        req.logout(function(err) {
-          if (err) { return next(err); }
-          req.session.destroy();
-          res
-            .clearCookie('authToken',{path: '/', domain:'localhost', httpOnly: true, sameSite: 'strict', secure: process.env.NODE_ENV === 'production'})
-            .clearCookie('user',{path: '/', domain:'localhost', httpOnly: false, sameSite: 'strict', secure: process.env.NODE_ENV === 'production'})
-            .clearCookie('connect.sid',{path: '/', domain:'localhost', httpOnly: true, sameSite: 'strict', secure: process.env.NODE_ENV === 'production'})
-            .send({ message: 'Sesión cerrada correctamente' });
+        UsuarioModel.createUsuario(usuario, (err, data) => {
+          if (err) {
+            res.status(500).json({ error: 'Error al crear usuario' });
+          } else {
+            res.status(201).json(data);
+          }
         });
-       
-      };
-    
+      } else {
+        throw new Error(usuarioValido.error.errors[0].message);
+      }
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  };
 
+  updateUsuario = (req, res) => {
+    const id = req.params.id;
+    const usuario = req.body;
 
+    const usuarioValido = usuarioSchema.safeParse(usuario);
 
-
-
-      getUserByMail = async (mail) => {
-        return new Promise((resolve, reject) => {
-            UsuarioModel.getUserByMail(mail, (err, data) => {
-                if (err) {
-                    reject('Error al buscar el mail');
-                } else {
-                    resolve(data.length > 0);
-                }
-            });
+    try {
+      if (usuarioValido.success) {
+        UsuarioModel.updateUsuario(id, usuario, (err, data) => {
+          if (err) {
+            res.status(500).json({ error: 'Error al actualizar usuario' });
+          } else {
+            res.json(data);
+          }
         });
+      } else {
+        throw new Error(usuarioValido.error.errors[0].message);
+      }
+    } catch (err) {
+      res.status(400).json({ error: err.message });
     }
+  };
 
-
-    forgotPassword = async (req, res) => {
-        const mail = req.body.mail;
-        try {
-            
-            const user =  await new Promise((resolve, reject) => {
-                UsuarioModel.getUserByMail(mail, (err, data) => {
-                    if (err) {
-                        reject('Error al buscar el mail');
-                    } else {
-                        resolve(data);
-                    }
-                });
-            });
-            
-            if (user.length > 0) {
-                
-                // Enviar mail
-                const resetToken = generateToken({ id:user[0].idUsuario, mail:user[0].mail });
-                const resetLink= process.env.FRONT_URL + '/reset-password/t=' + resetToken;
-                await emailMiddleware(user[0].mail, 'Recuperar contraseña', 'Haga click en el siguiente enlace para recuperar su contraseña: '+ resetLink);
-                res.json({ message: 'Se ha enviado un correo con las instrucciones para recuperar la contraseña' });
-            } else {
-                throw new Error('El mail no se encuentra registrado');
-            }
-        } catch (error) {
-            res.status(500).json({ error: error.message });
+  deleteUsuario = (req, res) => {
+    const id = req.params.id;
+    try {
+      UsuarioModel.deleteUsuario(id, (err, data) => {
+        if (err) {
+          res.status(500).json({ error: 'Error al eliminar usuario' });
+        } else {
+          res.json(data);
         }
-        
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
+  };
 
-    resetPassword = async (req, res) => {
-        const token = req.headers['authorization'].split(' ')[1];
-        const password = req.body.password;
-        const passEncriptada= await bcrypt.hash(password, 10); //Encripto la contraseña
-        try{
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  login = (req, res) => {
+    // ✅ soporta ambos: mail (viejo) y email (front actual)
+    const mail = req.body.mail || req.body.email;
+    const password = req.body.password;
 
-            UsuarioModel.getUsuarioById(decoded.id, (err, data) => {
-                if (err) {
-                    throw new Error('Error al buscar el usuario');
-                } else {
-                    if (data) {
+    const loginValido = loginschema.safeParse({ mail, password });
 
-                        UsuarioModel.updatePassword(data[0].mail, passEncriptada, (err, user) => {
-                            if (err) {
-                                throw new Error('Error al cambiar la contraseña');
-                            } else {
-                                res.status(200).json({ message: 'Contraseña actualizada correctamente' });
-                            }
-                        });
-                    } else {
-                        res.status(404).json({ error: 'Usuario no encontrado' });
-                    }
+    try {
+      if (loginValido.success) {
+        UsuarioModel.getUserByMail(mail, (err, data) => {
+          if (err) {
+            res.status(500).json({ error: 'Error al iniciar sesión' });
+          } else {
+            if (data.length > 0) {
+              try {
+                const isValid = bcrypt.compareSync(password, data[0].password);
+                if (!isValid) {
+                  throw new Error('Contraseña incorrecta');
                 }
-            });
-        }catch(err){
-            res.status(500).json({ error: err.message });
-        }
-    }
+              } catch (err) {
+                res.status(400).json({ error: 'Contraseña incorrecta' });
+                return;
+              }
 
-    sendEmail = async (req, res) => {
-        const { email, subject, message } = req.body;
-        const fullMessage = 'Correo: ' + email + '\n' + message;
-        
+              // ✅ Token sin password
+              const payload = {
+                idUsuario: data[0].idUsuario,
+                mail: data[0].mail,
+                nombre: data[0].nombre,
+                apellido: data[0].apellido,
+              };
 
-        try {
-            if (!email || !subject || !message) {
-                throw new Error('Faltan datos para enviar el correo');
+              const token = generateToken(payload);
+              const user = {
+                id: payload.idUsuario,
+                mail: payload.mail,
+                nombre: payload.nombre,
+                apellido: payload.apellido,
+              };
+
+              req.session.user = user;
+              req.session.save();
+
+              res
+                .cookie('authToken', token, {
+                  httpOnly: true,
+                  secure: process.env.NODE_ENV === 'production',
+                  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                  path: '/',
+                  maxAge: 1000 * 60 * 60 * 24,
+                })
+                .cookie('user', JSON.stringify(user), {
+                  httpOnly: false,
+                  secure: process.env.NODE_ENV === 'production',
+                  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                  path: '/',
+                  maxAge: 1000 * 60 * 60 * 24,
+                })
+                .send({ message: 'Sesión iniciada correctamente' });
+            } else {
+              res.status(404).send({ error: 'Usuario no encontrado' });
             }
-            await emailMiddleware(mailContacto, subject, fullMessage);
-            res.status(200).json({ message: 'Correo enviado correctamente' });
-        } catch (error) {
-            res.status(500).json({ error: 'Error al enviar el correo' });
-        }
+          }
+        });
+      } else {
+        throw new Error(loginValido.error.errors[0].message);
+      }
+    } catch (err) {
+      res.status(400).json({ error: err.message });
     }
+  };
 
-    getMe = (req, res) => {
-  // req.user viene del validateToken mejorado
-  if (!req.user) return res.status(401).json({ message: 'No autenticado' });
-  return res.json(req.user);
-};
+  logout = (req, res) => {
+    try {
+      req.session.destroy(() => {
+        res
+          .clearCookie('authToken', {
+            path: '/',
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            secure: process.env.NODE_ENV === 'production',
+          })
+          .clearCookie('user', {
+            path: '/',
+            httpOnly: false,
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            secure: process.env.NODE_ENV === 'production',
+          })
+          .clearCookie('connect.sid', {
+            path: '/',
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            secure: process.env.NODE_ENV === 'production',
+          })
+          .send({ message: 'Sesión cerrada correctamente' });
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };
 
+  forgotPassword = async (req, res) => {
+    const { mail } = req.body;
+    if (!mail) return res.status(400).json({ error: 'Mail requerido' });
 
+    try {
+      UsuarioModel.getUserByMail(mail, async (err, data) => {
+        if (err) return res.status(500).json({ error: 'Error al buscar usuario' });
+        if (!data || data.length === 0)
+          return res.status(404).json({ error: 'Usuario no encontrado' });
+
+        const user = data[0];
+
+        const token = jwt.sign(
+          { idUsuario: user.idUsuario, mail: user.mail },
+          process.env.JWT_SECRET,
+          { expiresIn: '15m' }
+        );
+
+        const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:4200'}/reset-password/${token}`;
+
+        await emailMiddleware.sendMail({
+          to: mail,
+          subject: 'Restablecer contraseña',
+          html: `<p>Para restablecer tu contraseña, ingresá al siguiente link:</p><p><a href="${resetUrl}">${resetUrl}</a></p>`,
+        });
+
+        return res.json({ message: 'Email enviado' });
+      });
+    } catch (err) {
+      return res.status(500).json({ error: 'Error al enviar email' });
+    }
+  };
+
+  resetPassword = (req, res) => {
+    const { token, password } = req.body;
+    if (!token || !password) return res.status(400).json({ error: 'Token y password requeridos' });
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const hashedPassword = bcrypt.hashSync(password, 10);
+
+      UsuarioModel.updatePassword(decoded.idUsuario, hashedPassword, (err) => {
+        if (err) return res.status(500).json({ error: 'Error al actualizar password' });
+        return res.json({ message: 'Contraseña actualizada' });
+      });
+    } catch (err) {
+      return res.status(400).json({ error: 'Token inválido o expirado' });
+    }
+  };
+
+  sendEmail = async (req, res) => {
+    const { nombre, mail, mensaje } = req.body;
+
+    try {
+      await emailMiddleware.sendMail({
+        to: mailContacto,
+        subject: `Contacto: ${nombre} (${mail})`,
+        html: `<p><b>Nombre:</b> ${nombre}</p><p><b>Mail:</b> ${mail}</p><p><b>Mensaje:</b><br/>${mensaje}</p>`,
+      });
+
+      return res.json({ message: 'Email enviado' });
+    } catch (err) {
+      return res.status(500).json({ error: 'Error al enviar email' });
+    }
+  };
+
+  // ✅ Devuelve el usuario autenticado a partir del JWT (cookie authToken)
+  me = (req, res) => {
+    try {
+      const idUsuario = req.user?.idUsuario;
+      if (!idUsuario) {
+        return res.status(401).json({ error: 'No autenticado' });
+      }
+
+      UsuarioModel.getUsuarioById(idUsuario, (err, data) => {
+        if (err) return res.status(500).json({ error: 'Error al obtener usuario' });
+        if (!data || data.length === 0)
+          return res.status(404).json({ error: 'Usuario no encontrado' });
+
+        const u = data[0];
+        return res.json({ id: u.idUsuario, mail: u.mail, nombre: u.nombre, apellido: u.apellido });
+      });
+    } catch (e) {
+      return res.status(500).json({ error: 'Error al obtener usuario' });
+    }
+  };
 }
 
 module.exports = new UsuarioController();

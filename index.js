@@ -1,90 +1,113 @@
+require('dotenv').config();
+
 const cors = require('cors');
 const express = require('express');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const passport = require('passport');
+
+require('./middlewares/passport');
+
 const gimnasioRouter = require('./routes/gimnasio');
 const usuarioRouter = require('./routes/usuario');
 const socioRouter = require('./routes/socio');
 const planRouter = require('./routes/plan');
 const inscripcionRouter = require('./routes/inscripcion');
+const historicoPreciosRouter = require('./routes/historico_precios');
+const metodoPagoRouter = require('./routes/metodo_pago');
 const pagoRouter = require('./routes/pago');
-const passport = require('passport');
-const session = require('express-session');
-require('./middlewares/passport');
-const { generateToken } = require('./middlewares/token');
-const cookieParser = require('cookie-parser');
-const historicoPreciosRoutes = require('./routes/historico_precios');
-const metodoPagoRoutes = require('./routes/metodo_pago');
-const pagoRoutes = require('./routes/pago');
-const ingresosRoutes = require('./routes/ingreso');
+const ingresoRouter = require('./routes/ingreso');
 
-//Variables de entorno
-require('dotenv').config();
-const port = process.env.PORT;
-const expressSessionSecret = process.env.EXPRESS_SESSION_SECRET;
-const frontUrl = process.env.FRONT_URL;
+const { generateToken } = require('./middlewares/token');
 
 const app = express();
 
-//Middlewares
+const frontUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
+const isProd = process.env.NODE_ENV === 'production';
+
+function authCookieOptions() {
+  return {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    path: '/',
+    maxAge: 1000 * 60 * 60 * 24, // 24hs
+  };
+}
+
+function userCookieOptions() {
+  return {
+    httpOnly: false,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    path: '/',
+    maxAge: 1000 * 60 * 60 * 24, // 24hs
+  };
+}
+
 app.use(cookieParser());
-app.use(session({ secret: expressSessionSecret, resave: false, saveUninitialized: true }));
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(express.json());
+
+// ✅ CORS con cookies (credenciales)
 app.use(
   cors({
-    origin: frontUrl, // Permitir el origen del frontend
-    credentials: true, // Permitir envío de cookies y cabeceras de autenticación
+    origin: [frontUrl, 'http://localhost:4200', 'http://127.0.0.1:4200'],
+    credentials: true,
   })
 );
 
-app.use(express.json());
+// ✅ Session + Passport (para Google OAuth)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'dev_secret',
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
-//LOGIN MANEJADO POR GOOGLE
-
+// ✅ Google OAuth
 app.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
 
 app.get('/auth/google/callback', passport.authenticate('google'), (req, res) => {
-  if (req.user) {
-    const payload = req.user; //Hace falta mandar la contra o la puedo sacar?
-    const token = generateToken(payload);
-    const user = {
-      id: req.user.idUsuario,
-      mail: req.user.mail,
-      nombre: req.user.nombre,
-      apellido: req.user.apellido,
-    };
+  if (!req.user) return res.status(404).send({ error: 'Usuario no encontrado' });
 
+  // ✅ NO metas password en el token
+  const payload = {
+    idUsuario: req.user.idUsuario,
+    mail: req.user.mail,
+    nombre: req.user.nombre,
+    apellido: req.user.apellido,
+  };
+
+  const token = generateToken(payload);
+  const user = {
+    id: payload.idUsuario,
+    mail: payload.mail,
+    nombre: payload.nombre,
+    apellido: payload.apellido,
+  };
+
+  return (
     res
-      .cookie('authToken', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
-        sameSite: 'strict',
-        maxAge: 1000 * 60 * 60 * 24, // 24 horas
-      })
-      .cookie('user', JSON.stringify(user), {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
-        sameSite: 'strict',
-        maxAge: 1000 * 60 * 60 * 24, // 24 horas
-      })
-      .redirect(`${frontUrl}/main`);
-    // .send({ message: 'Sesión iniciada correctamente' }); ver si puedo usar esto mejor
-  } else {
-    res.status(404).send({ error: 'Usuario no encontrado' });
-  }
+      .cookie('authToken', token, authCookieOptions())
+      .cookie('user', JSON.stringify(user), userCookieOptions())
+      // ✅ importante: el front valida /usuarios/me en esta ruta
+      .redirect(`${frontUrl}/auth/callback`)
+  );
 });
 
-//Definicón de rutas
+// Routers
 app.use('/gimnasios', gimnasioRouter);
 app.use('/usuarios', usuarioRouter);
 app.use('/socios', socioRouter);
 app.use('/planes', planRouter);
 app.use('/inscripciones', inscripcionRouter);
-app.use('/historico-precios', historicoPreciosRoutes);
-app.use('/metodos-pago', metodoPagoRoutes);
-app.use('/pagos', pagoRoutes);
-app.use('/ingresos', ingresosRoutes);
+app.use('/historico-precios', historicoPreciosRouter);
+app.use('/metodos-pago', metodoPagoRouter);
+app.use('/pagos', pagoRouter);
+app.use('/ingresos', ingresoRouter);
 
-//Levantar el servidor
-app.listen(port, () => {
-  console.log('Este es un pasito que le gusta a los turro baila pegaito a la pare olright', port);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Servidor backend corriendo en puerto ${PORT}`));
