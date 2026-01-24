@@ -135,7 +135,7 @@ class SocioModel {
 
   getUltimoPlan(idSocio, callback) {
     db.query(
-      'SELECT * FROM socio_plan WHERE idSocio=? ORDER BY fechaFin DESC LIMIT 1 AND deletedAt IS NULL;',
+      'SELECT * FROM socio_plan WHERE idSocio=? AND deletedAt IS NULL ORDER BY fechaFin DESC LIMIT 1;',
       [idSocio],
       callback
     );
