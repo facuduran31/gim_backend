@@ -46,12 +46,12 @@ class SocioModel {
           SELECT hp.precio
           FROM historico_precios hp
           WHERE hp.idPlan = pl.idPlan
-            AND hp.deletedAt IS NULL
-            AND hp.fechaDesde <= CURDATE()
-            AND (hp.fechaHasta IS NULL OR CURDATE() <= hp.fechaHasta)
-          ORDER BY hp.fechaDesde DESC
+          AND hp.deletedAt IS NULL
+          AND hp.fechaHasta IS NULL
+          ORDER BY hp.idHistoricoPrecios DESC
           LIMIT 1
         ) AS precioPlan
+
 
       FROM socio s
       LEFT JOIN socio_plan sp
