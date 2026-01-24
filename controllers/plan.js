@@ -50,11 +50,9 @@ class PlanController {
 
       const idPlan = data.insertId;
 
-      // ✅ Insertar histórico vigente (fechaHasta NULL)
       historicoPreciosModel.createHistoricoPrecio({ idPlan, precio: plan.precio }, (err2) => {
         if (err2) {
           console.error('Error al guardar histórico de precios:', err2);
-          // no frenamos la creación del plan, pero lo reportamos
         }
         return res.status(201).json({ message: 'Plan creado con éxito', idPlan });
       });
@@ -64,17 +62,15 @@ class PlanController {
   updatePlan = (req, res) => {
     const idPlan = Number(req.params.id);
 
-    const plan = { ...req.body, idPlan }; // ✅ unificamos a idPlan (no id)
+    const plan = { ...req.body, idPlan };
 
     const planValido = planSchema.safeParse(plan);
     if (!planValido.success) {
-      // 👇 esto es lo que vos estabas viendo en console.log(planValido.error)
       return res
         .status(400)
         .json({ error: planValido.error.errors[0].message, details: planValido.error.errors });
     }
 
-    // 1) traer precio vigente anterior
     historicoPreciosModel.getUltimoHistoricoByPlan(idPlan, (err, oldData) => {
       if (err)
         return res
@@ -83,14 +79,12 @@ class PlanController {
 
       const precioAnterior = oldData?.length ? Number(oldData[0].precio) : null;
 
-      // 2) update datos del plan (SIN precio real en tabla, pero tu model lo hará con columnas propias)
       planModel.updatePlan(plan, (err2) => {
         if (err2)
           return res
             .status(500)
             .json({ error: 'Error al actualizar el plan', mysql: err2.sqlMessage });
 
-        // 3) si cambió el precio, cerramos histórico anterior y abrimos nuevo
         const precioNuevo = Number(plan.precio);
 
         const cambioPrecio = precioAnterior === null ? true : precioNuevo !== precioAnterior;
