@@ -23,38 +23,49 @@ class SocioModel {
 
   getSociosByGimnasioConPlanActual = (idGimnasio, callback) => {
     const sql = `
-    SELECT
-      s.idSocio,
-      s.dni,
-      s.nombre,
-      s.apellido,
-      s.telefono,
-      s.activo,
-      s.idGimnasio,
+      SELECT
+        s.idSocio,
+        s.dni,
+        s.nombre,
+        s.apellido,
+        s.telefono,
+        s.activo,
+        s.idGimnasio,
 
-      sp.idSocioPlan,      
-      sp.fechaInicio,
-      sp.fechaFin,
+        sp.idSocioPlan,
+        sp.fechaInicio,
+        sp.fechaFin,
 
-      p.idPlan,
-      p.nombre AS nombrePlan,
-      p.descripcion,
-      p.duracion,
-      p.diasPorSemana
+        pl.idPlan,
+        pl.nombre AS nombrePlan,
+        pl.descripcion,
+        pl.duracion,
+        pl.diasPorSemana,
 
-    FROM socio s
-    LEFT JOIN socio_plan sp
-      ON sp.idSocio = s.idSocio
-      AND sp.deletedAt IS NULL
-      AND CURDATE() BETWEEN sp.fechaInicio AND sp.fechaFin
+        (
+          SELECT hp.precio
+          FROM historico_precios hp
+          WHERE hp.idPlan = pl.idPlan
+            AND hp.deletedAt IS NULL
+            AND hp.fechaDesde <= CURDATE()
+            AND (hp.fechaHasta IS NULL OR CURDATE() <= hp.fechaHasta)
+          ORDER BY hp.fechaDesde DESC
+          LIMIT 1
+        ) AS precioPlan
 
-    LEFT JOIN plan p
-      ON p.idPlan = sp.idPlan
-      AND p.deletedAt IS NULL
+      FROM socio s
+      LEFT JOIN socio_plan sp
+        ON sp.idSocio = s.idSocio
+        AND sp.deletedAt IS NULL
+        AND CURDATE() BETWEEN sp.fechaInicio AND sp.fechaFin
 
-    WHERE s.idGimnasio = ?
-      AND s.deletedAt IS NULL
-  `;
+      LEFT JOIN plan pl
+        ON pl.idPlan = sp.idPlan
+        AND pl.deletedAt IS NULL
+
+      WHERE s.idGimnasio = ?
+        AND s.deletedAt IS NULL
+    `;
 
     db.query(sql, [idGimnasio], callback);
   };

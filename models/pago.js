@@ -38,11 +38,22 @@ class PagoModel {
         p.idMetodoPago,
         mp.nombre AS metodoPago,
         p.monto,
-        p.fechaPago
+        p.fechaPago,
+
+        sp.idSocio,
+        sp.idPlan,
+        sp.fechaInicio,
+        sp.fechaFin,
+
+        pl.nombre AS nombrePlan
       FROM pago p
       INNER JOIN metodo_pago mp ON mp.idMetodoPago = p.idMetodoPago
+      INNER JOIN socio_plan sp ON sp.idSocioPlan = p.idSocioPlan
+      INNER JOIN plan pl ON pl.idPlan = sp.idPlan
       WHERE p.idSocioPlan = ?
         AND p.deletedAt IS NULL
+        AND sp.deletedAt IS NULL
+        AND pl.deletedAt IS NULL
       ORDER BY p.fechaPago DESC
       `,
       [idSocioPlan],
@@ -72,6 +83,7 @@ class PagoModel {
       WHERE sp.idSocio = ?
         AND p.deletedAt IS NULL
         AND sp.deletedAt IS NULL
+        AND pl.deletedAt IS NULL
       ORDER BY p.fechaPago DESC
       `,
       [idSocio],
