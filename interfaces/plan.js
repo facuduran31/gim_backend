@@ -1,14 +1,14 @@
-const z = require('zod');
+const { z } = require('zod');
 
 const planSchema = z.object({
-  id: z.number().int().positive().optional(),
-  nombre: z.string(),
-  descripcion: z.string().optional(),
-  precio: z.number().positive(),
-  duracion: z.number().int().positive(),
-  diasPorSemana: z.number().int().positive().optional(), //ver como resolver esto
-  idGimnasio: z.number().int().positive(),
-  deletedAt: z.date().optional(),
+  idPlan: z.coerce.number().int().optional(),
+
+  idGimnasio: z.coerce.number().int(),
+  nombre: z.string().min(2),
+  descripcion: z.string().optional().nullable(),
+  duracion: z.coerce.number().int().positive(),
+  diasPorSemana: z.coerce.number().int().positive(),
+  precio: z.coerce.number().positive(),
 });
 
 module.exports = planSchema;

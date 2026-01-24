@@ -44,7 +44,6 @@ class HistoricoPreciosController {
   update = (req, res) => {
     const datos = { ...req.body, id: parseInt(req.params.id) };
     const valido = historicoPreciosSchema.safeParse(datos);
-
     if (!valido.success) return res.status(400).json({ message: valido.error.errors[0].message });
 
     historicoPreciosModel.update(datos, (err) => {
