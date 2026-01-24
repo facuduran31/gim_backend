@@ -21,32 +21,43 @@ class SocioModel {
     );
   }
 
-  getSociosByGimnasioConPlanActual(idGimnasio, callback) {
+  getSociosByGimnasioConPlanActual = (idGimnasio, callback) => {
     const sql = `
     SELECT
-      s.*,
+      s.idSocio,
+      s.dni,
+      s.nombre,
+      s.apellido,
+      s.telefono,
+      s.activo,
+      s.idGimnasio,
+
+      sp.idSocioPlan,      
+      sp.fechaInicio,
+      sp.fechaFin,
+
       p.idPlan,
       p.nombre AS nombrePlan,
       p.descripcion,
       p.duracion,
-      p.diasPorSemana,
-      sp.fechaInicio,
-      sp.fechaFin
+      p.diasPorSemana
+
     FROM socio s
     LEFT JOIN socio_plan sp
       ON sp.idSocio = s.idSocio
       AND sp.deletedAt IS NULL
       AND CURDATE() BETWEEN sp.fechaInicio AND sp.fechaFin
+
     LEFT JOIN plan p
       ON p.idPlan = sp.idPlan
       AND p.deletedAt IS NULL
+
     WHERE s.idGimnasio = ?
       AND s.deletedAt IS NULL
-    ORDER BY s.apellido, s.nombre;
   `;
 
     db.query(sql, [idGimnasio], callback);
-  }
+  };
 
   getByGimnasio = (idGimnasio, { from, to }, callback) => {
     let sql = `
