@@ -16,21 +16,19 @@ class PagoController {
     });
   };
 
-  getByGimnasio = (req, res) => {
-    const { idGimnasio } = req.params;
-    const { from, to } = req.query; // opcional: 'YYYY-MM-DD'
-
-    pagoModel.getByGimnasio(idGimnasio, { from, to }, (err, data) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(data);
-    });
-  };
-
-  // 🔥 ESTE ES EL QUE TE FALTABA
   getBySocioPlan = (req, res) => {
     const { idSocioPlan } = req.params;
 
     pagoModel.getBySocioPlan(idSocioPlan, (err, data) => {
+      if (err) return res.status(500).json(err);
+      res.json(data);
+    });
+  };
+
+  getBySocio = (req, res) => {
+    const { idSocio } = req.params;
+
+    pagoModel.getBySocio(idSocio, (err, data) => {
       if (err) return res.status(500).json(err);
       res.json(data);
     });
