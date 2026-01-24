@@ -1,59 +1,71 @@
 const pagoModel = require('../models/pago');
 const pagoSchema = require('../interfaces/pago');
 
-class PagoController {
-  getAll = (req, res) => {
+module.exports = {
+  getAll(req, res) {
     pagoModel.getAll((err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err)
+        return res.status(500).json({ error: 'Error al obtener pagos', mysql: err.sqlMessage });
       res.json(data);
     });
-  };
+  },
 
-  getById = (req, res) => {
+  getById(req, res) {
     pagoModel.getById(req.params.id, (err, data) => {
-      if (err) return res.status(500).json(err);
-      res.json(data[0]);
+      if (err)
+        return res.status(500).json({ error: 'Error al obtener pago', mysql: err.sqlMessage });
+      res.json(data?.[0] ?? null);
     });
-  };
+  },
 
-  getBySocioPlan = (req, res) => {
-    const { idSocioPlan } = req.params;
-
-    pagoModel.getBySocioPlan(idSocioPlan, (err, data) => {
-      if (err) return res.status(500).json(err);
+  getBySocioPlan(req, res) {
+    pagoModel.getBySocioPlan(req.params.idSocioPlan, (err, data) => {
+      if (err)
+        return res.status(500).json({ error: 'Error al obtener pagos', mysql: err.sqlMessage });
       res.json(data);
     });
-  };
+  },
 
-  getBySocio = (req, res) => {
-    const { idSocio } = req.params;
-
-    pagoModel.getBySocio(idSocio, (err, data) => {
-      if (err) return res.status(500).json(err);
+  getBySocio(req, res) {
+    pagoModel.getBySocio(req.params.idSocio, (err, data) => {
+      if (err)
+        return res.status(500).json({ error: 'Error al obtener pagos', mysql: err.sqlMessage });
       res.json(data);
     });
-  };
+  },
 
-  create = (req, res) => {
+  create(req, res) {
     const nuevo = req.body;
+    console.log('Pago recibido:', nuevo);
 
     const valido = pagoSchema.safeParse(nuevo);
     if (!valido.success) {
-      return res.status(400).json(valido.error.errors);
+      return res.status(400).json({ error: 'Datos inválidos', details: valido.error.errors });
     }
 
-    pagoModel.create(nuevo, (err) => {
-      if (err) return res.status(500).json(err);
-      res.json({ message: 'Pago creado correctamente' });
-    });
-  };
+    pagoModel.create(nuevo, (err, result) => {
+      if (err) {
+        console.error('ERROR MySQL create pago:', err.code, err.sqlMessage);
 
-  delete = (req, res) => {
+        if (err.code === 'ER_NO_REFERENCED_ROW_2' || err.code === 'ER_NO_REFERENCED_ROW') {
+          return res.status(400).json({
+            error: 'Foreign key: idSocioPlan o idMetodoPago no existe',
+            mysql: err.sqlMessage,
+          });
+        }
+
+        return res.status(500).json({ error: 'Error al crear pago', mysql: err.sqlMessage });
+      }
+
+      res.status(201).json({ message: 'Pago creado correctamente', idPago: result.insertId });
+    });
+  },
+
+  delete(req, res) {
     pagoModel.delete(req.params.id, (err) => {
-      if (err) return res.status(500).json(err);
+      if (err)
+        return res.status(500).json({ error: 'Error al eliminar pago', mysql: err.sqlMessage });
       res.json({ message: 'Pago eliminado correctamente' });
     });
-  };
-}
-
-module.exports = new PagoController();
+  },
+};
